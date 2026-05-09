@@ -49,37 +49,37 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --background: #0f1117;
+  --foreground: #e0e4f0;
+  --card: #1a1d2e;
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --primary: #7b8cde;
+  --primary-foreground: #ffffff;
+  --secondary: #202437;
+  --secondary-foreground: #d9def0;
+  --muted: #202437;
+  --muted-foreground: #a0a8c0;
+  --accent: #7b8cde;
+  --accent-foreground: #ffffff;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #2a2d3e;
+  --input: #2a2d3e;
+  --ring: #7b8cde;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.5rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar: #1a1d2e;
+  --sidebar-foreground: #a0a8c0;
+  --sidebar-primary: #7b8cde;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #202437;
+  --sidebar-accent-foreground: #e0e4f0;
+  --sidebar-border: #2a2d3e;
   --sidebar-ring: oklch(0.708 0 0);
 }
 
@@ -125,11 +125,11 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-[#07090f] text-foreground;
+    @apply bg-background text-foreground;
     background:
-      radial-gradient(circle at 10% -10%, rgba(45, 212, 191, 0.16), transparent 28rem),
-      radial-gradient(circle at 90% 0%, rgba(244, 63, 94, 0.12), transparent 24rem),
-      #07090f;
+      radial-gradient(circle at 14% -10%, rgba(123, 140, 222, 0.16), transparent 42%),
+      radial-gradient(circle at 85% 0%, rgba(82, 196, 26, 0.08), transparent 35%),
+      #0f1117;
   }
   html {
     @apply font-sans;

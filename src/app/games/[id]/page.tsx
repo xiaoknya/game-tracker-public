@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 
-import { buttonVariants } from "@/components/ui/button";
-import { GameTile } from "@/components/game-tile";
+import { AppShell, MobileNav } from "@/components/app-shell";
+import { DashboardCard } from "@/components/dashboard-card";
 import { MetricRow } from "@/components/metric-row";
 import { RatingBadge } from "@/components/rating-badge";
-import { SiteHeader } from "@/components/site-header";
 import { Sparkline } from "@/components/sparkline";
+import { buttonVariants } from "@/components/ui/button";
 import { gameApi, steamCover } from "@/lib/api";
 import { compactNumber, integer, releaseDate, releaseStatus, score, signedCompact, tagsFromGame } from "@/lib/format";
 
@@ -35,64 +35,59 @@ export default async function GameDetailPage({
   const latestSnapshot = snapshots.at(-1);
   const latestScore = scores[0];
   const tags = tagsFromGame(game, 6);
-  const latestReview = latestSnapshot?.steam_review_total;
   const positiveRate =
     latestSnapshot?.steam_review_total && latestSnapshot.steam_review_positive
       ? Math.round((latestSnapshot.steam_review_positive / latestSnapshot.steam_review_total) * 100)
       : null;
 
   return (
-    <main className="min-h-screen text-white">
-      <SiteHeader />
+    <AppShell activePath="/games">
+      <MobileNav />
+      <Link
+        href="/"
+        className="mb-4 inline-flex items-center gap-2 text-sm text-[#7a8099] transition hover:text-[#d9def0]"
+      >
+        <ArrowLeft className="size-4" />
+        返回主看板
+      </Link>
 
-      <section className="relative isolate overflow-hidden border-b border-white/10">
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt=""
-            className="absolute inset-0 -z-20 h-full w-full object-cover opacity-30 blur-[1px] scale-105"
-          />
-        ) : null}
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#07090f_0%,rgba(7,9,15,.94)_45%,rgba(7,9,15,.55)_100%)]" />
-
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_.9fr] lg:px-8">
-          <div className="animate-rise">
-            <Link
-              href="/"
-              className={buttonVariants({
-                variant: "ghost",
-                className: "mb-8 text-white/60 hover:text-white",
-              })}
-            >
-              <ArrowLeft className="size-4" />
-              返回热度榜
-            </Link>
-            <div className="flex flex-wrap items-center gap-3">
+      <section className="overflow-hidden rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] shadow-[0_10px_26px_rgba(2,6,23,0.3)]">
+        <div className="grid gap-6 p-5 lg:grid-cols-[1fr_360px]">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
               <RatingBadge rating={game.rating} />
-              <span className="text-sm text-white/50">{releaseStatus(game)}</span>
+              <span className="rounded-sm bg-[#0f1117] px-2 py-1 text-xs text-[#a0a8c0]">
+                {releaseStatus(game)}
+              </span>
+              <span className="rounded-sm bg-[#0f1117] px-2 py-1 text-xs text-[#a0a8c0]">
+                发售日: {releaseDate(game.release_date, game.release_date_is_fuzzy)}
+              </span>
             </div>
-            <h1 className="mt-5 max-w-4xl text-balance text-5xl font-semibold tracking-tight sm:text-6xl">
+            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#e0e4f0] sm:text-4xl">
               {game.name}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/60">
-              {game.short_description || game.name_en || "暂无简介"}
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#7a8099]">
+              {game.developer ? <span>开发商: {game.developer}</span> : null}
+              {game.publisher && game.publisher !== game.developer ? <span>发行商: {game.publisher}</span> : null}
+            </div>
+            {game.short_description ? (
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-[#a0a8c0]">{game.short_description}</p>
+            ) : null}
+            <div className="mt-4 flex flex-wrap gap-1.5">
               {tags.map((tag) => (
-                <span key={tag} className="rounded-sm bg-white/10 px-2 py-1 text-xs text-white/60">
+                <span key={tag} className="rounded-sm bg-[#0f1117] px-2 py-1 text-[11px] text-[#7a8099]">
                   {tag}
                 </span>
               ))}
             </div>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-2">
               {game.steam_url ? (
                 <a
                   href={game.steam_url}
                   target="_blank"
                   rel="noreferrer"
                   className={buttonVariants({
-                    className: "bg-teal-300 text-[#071014] hover:bg-teal-200",
+                    className: "bg-[#7b8cde] text-white hover:bg-[#8fa0ff]",
                   })}
                 >
                   Steam <ExternalLink className="size-4" />
@@ -105,7 +100,7 @@ export default async function GameDetailPage({
                   rel="noreferrer"
                   className={buttonVariants({
                     variant: "outline",
-                    className: "border-white/20 bg-white/5 text-white hover:bg-white/10",
+                    className: "border-[#2a2d3e] bg-[#0f1117] text-[#d9def0] hover:bg-[#202437]",
                   })}
                 >
                   SteamDB <ExternalLink className="size-4" />
@@ -114,45 +109,53 @@ export default async function GameDetailPage({
             </div>
           </div>
 
-          <div className="animate-fade rounded-md border border-white/12 bg-black/25 p-4 backdrop-blur">
-            <div className="aspect-[16/9] overflow-hidden rounded bg-white/5">
+          <div>
+            <div className="aspect-[16/9] overflow-hidden rounded-lg bg-[#0b0e16]">
               {image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={image} alt="" className="h-full w-full object-cover" />
               ) : null}
             </div>
-            <Sparkline snapshots={snapshots} className="mt-5 h-24 w-full" />
           </div>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
-        <div>
-          <div className="grid gap-8 border-t border-white/10 pt-2 sm:grid-cols-2 lg:grid-cols-4">
-            <MetricRow label="Followers" value={compactNumber(game.followers)} sub="SteamDB community" />
-            <MetricRow label="7 日增长" value={signedCompact(game.followers_7d_delta)} tone="teal" />
+      <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_360px]">
+        <div className="space-y-5">
+          <div className="grid gap-3 rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4 sm:grid-cols-4">
+            <MetricRow label="Followers" value={compactNumber(game.followers)} sub="SteamDB" />
+            <MetricRow label="7日增长" value={signedCompact(game.followers_7d_delta)} tone="teal" />
             <MetricRow label="综合分" value={score(game.total_score)} sub={game.score_date || "未评分"} />
-            <MetricRow label="发售日" value={releaseDate(game.release_date, game.release_date_is_fuzzy)} />
+            <MetricRow label="Steam 评测" value={latestSnapshot?.steam_review_total ? integer(latestSnapshot.steam_review_total) : "—"} sub={positiveRate ? `${positiveRate}% 好评` : undefined} />
           </div>
 
-          <section className="mt-12 border-t border-white/10 pt-8">
-            <h2 className="text-2xl font-semibold">评分拆解</h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <section className="rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4">
+            <div className="mb-3">
+              <div className="text-xs uppercase tracking-[0.16em] text-[#7b8cde]">Trendline</div>
+              <h2 className="mt-1 text-base font-semibold text-[#e0e4f0]">Followers 趋势（45天）</h2>
+            </div>
+            <Sparkline snapshots={snapshots} className="h-32 w-full" />
+          </section>
+
+          <section className="rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4">
+            <div className="text-xs uppercase tracking-[0.16em] text-[#7b8cde]">Score Radar</div>
+            <h2 className="mt-1 text-base font-semibold text-[#e0e4f0]">五维评分拆解</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
                 ["Followers", latestScore?.score_followers],
-                ["Growth", latestScore?.score_growth],
+                ["增长", latestScore?.score_growth],
                 ["Reddit", latestScore?.score_reddit ?? latestScore?.score_baidu],
                 ["Bilibili", latestScore?.score_bilibili],
                 ["MOD", latestScore?.score_mod],
               ].map(([label, value]) => (
-                <div key={label} className="border-t border-white/10 py-4">
+                <div key={label} className="rounded-md bg-[#0f1117] p-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-white/55">{label}</span>
-                    <span className="font-mono text-white">{typeof value === "number" ? value.toFixed(2) : "—"}</span>
+                    <span className="text-[#a0a8c0]">{label}</span>
+                    <span className="font-mono text-[#e0e4f0]">{typeof value === "number" ? value.toFixed(2) : "—"}</span>
                   </div>
-                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#2a2d3e]">
                     <div
-                      className="h-full rounded-full bg-teal-300"
+                      className="h-full rounded-full bg-[#7b8cde]"
                       style={{ width: `${Math.min(100, ((Number(value) || 0) / 4.5) * 100)}%` }}
                     />
                   </div>
@@ -162,16 +165,17 @@ export default async function GameDetailPage({
           </section>
 
           {reviewSummary?.topics?.length ? (
-            <section className="mt-12 border-t border-white/10 pt-8">
-              <h2 className="text-2xl font-semibold">玩家评测摘要</h2>
-              <div className="mt-6 grid gap-4">
+            <section className="rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4">
+              <div className="text-xs uppercase tracking-[0.16em] text-[#7b8cde]">Review Insight</div>
+              <h2 className="mt-1 text-base font-semibold text-[#e0e4f0]">玩家评测摘要</h2>
+              <div className="mt-4 divide-y divide-[#2a2d3e]">
                 {reviewSummary.topics.slice(0, 4).map((topic) => (
-                  <article key={topic.title} className="border-t border-white/10 py-4">
+                  <article key={topic.title} className="py-3">
                     <div className="flex items-center justify-between gap-4">
-                      <h3 className="font-semibold">{topic.title}</h3>
-                      <span className="font-mono text-sm text-teal-100">{topic.pct}%</span>
+                      <h3 className="text-sm font-semibold text-[#d9def0]">{topic.title}</h3>
+                      <span className="font-mono text-xs text-[#7b8cde]">{topic.pct}%</span>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-white/50">{topic.description}</p>
+                    <p className="mt-2 text-sm leading-6 text-[#a0a8c0]">{topic.description}</p>
                   </article>
                 ))}
               </div>
@@ -179,44 +183,26 @@ export default async function GameDetailPage({
           ) : null}
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
-          <MetricRow
-            label="Steam Reviews"
-            value={latestReview ? integer(latestReview) : "—"}
-            sub={positiveRate ? `${positiveRate}% positive` : "暂无评测样本"}
-            tone={positiveRate && positiveRate >= 80 ? "teal" : undefined}
-          />
-          <MetricRow
-            label="Median Playtime"
-            value={
-              latestSnapshot?.steam_median_playtime
-                ? `${Math.round(latestSnapshot.steam_median_playtime / 60)}h`
-                : "—"
-            }
-            sub="近期评测样本"
-          />
-          <div className="border-t border-white/10 py-5">
-            <div className="flex items-center gap-2 text-sm text-white/70">
-              <Users className="size-4 text-teal-200" />
-              月度评测
-            </div>
+        <aside className="space-y-5 xl:sticky xl:top-24 xl:self-start">
+          <section className="rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4">
+            <div className="text-sm font-semibold text-[#e0e4f0]">月度评测趋势</div>
             <div className="mt-4 space-y-2">
               {reviewMonthly.slice(-6).map((item) => (
                 <div key={item.month} className="flex items-center justify-between text-sm">
-                  <span className="text-white/45">{item.month.slice(0, 7)}</span>
-                  <span className="font-mono text-white/70">{compactNumber(item.new_reviews)}</span>
+                  <span className="text-[#7a8099]">{item.month.slice(0, 7)}</span>
+                  <span className="font-mono text-[#a0a8c0]">{compactNumber(item.new_reviews)}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
+
           {similar.length ? (
-            <div className="border-t border-white/10 py-5">
-              <div className="text-sm text-white/70">相似游戏</div>
-              <div className="mt-2">
+            <section className="rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-4">
+              <div className="mb-3 text-sm font-semibold text-[#e0e4f0]">相似游戏</div>
+              <div className="grid gap-3">
                 {similar.map((item) => (
-                  <GameTile
+                  <DashboardCard
                     key={item.id}
-                    compact
                     game={{
                       ...item,
                       name_en: null,
@@ -242,10 +228,11 @@ export default async function GameDetailPage({
                   />
                 ))}
               </div>
-            </div>
+            </section>
           ) : null}
         </aside>
-      </section>
-    </main>
+      </div>
+    </AppShell>
   );
 }
+
