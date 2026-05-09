@@ -5,8 +5,9 @@ import { ArrowLeft, ExternalLink, Globe, Users } from "lucide-react";
 import { AppShell, MobileNav } from "@/components/app-shell";
 import { FollowersTrend } from "@/components/charts/followers-trend";
 import { ReviewTrend } from "@/components/charts/review-trend";
-import { ScoreRadar } from "@/components/charts/score-radar";
+import { RadarChart } from "@/components/radar-chart";
 import { RatingBadge } from "@/components/rating-badge";
+import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
 import { buttonVariants } from "@/components/ui/button";
 import { gameApi, steamCover, type ReleasedGame } from "@/lib/api";
@@ -247,9 +248,12 @@ export default async function GameDetailPage({
 
           {/* Score radar */}
           <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
-            <SectionHeader eyebrow="Score Radar" title="五维评分" />
+            <div className="flex items-start justify-between gap-2">
+              <SectionHeader eyebrow="Score Radar" title="五维评分" />
+              <ScoreInfo />
+            </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-[auto_1fr] items-center">
-              <ScoreRadar latestScore={latestScore} />
+              <RadarChart latestScore={latestScore} />
               <div className="space-y-2">
                 {[
                   { label: "Followers", val: latestScore?.score_followers },
@@ -393,7 +397,7 @@ export default async function GameDetailPage({
                     <span className="font-mono text-[#c0c8e0]">{compactNumber(item.new_reviews)}</span>
                     {item.positive_rate != null && (
                       <span className={`font-mono text-[12px] ${item.positive_rate >= 0.8 ? "text-emerald-400" : item.positive_rate >= 0.6 ? "text-[#7b8cde]" : "text-rose-400"}`}>
-                        {Math.round(item.positive_rate * 100)}%
+                        {item.positive_rate != null ? (item.positive_rate > 1 ? Math.round(item.positive_rate) : Math.round(item.positive_rate * 100)) : 0}%
                       </span>
                     )}
                   </div>

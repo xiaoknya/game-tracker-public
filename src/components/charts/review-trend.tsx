@@ -30,12 +30,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+/** Normalize positive_rate to 0-100, regardless of whether API returns 0-1 or 0-100 */
+function toPct(v: number | null): number | null {
+  if (v == null) return null
+  return Math.round(v > 1 ? v : v * 100)
+}
+
 export function ReviewTrend({ data }: { data: ReviewMonthlyStat[] }) {
   const items = data.slice(-9).map((d) => ({
     month: d.month?.slice(0, 7) ?? '',
     new_reviews: d.new_reviews ?? 0,
-    positive_pct:
-      d.positive_rate != null ? Math.round(d.positive_rate * 100) : null,
+    positive_pct: toPct(d.positive_rate),
   }))
 
   if (items.length === 0) {
