@@ -10,6 +10,8 @@ const RATINGS = ['S', 'A', 'B', 'C'] as const
 type Rating = (typeof RATINGS)[number]
 
 const DAY_OPTIONS = [30, 60, 90, 180]
+const INITIAL = 12
+const STEP = 12
 
 const RATING_ACTIVE: Record<Rating, string> = {
   S: 'border-rose-400 bg-rose-400 text-[#0f1117]',
@@ -17,9 +19,7 @@ const RATING_ACTIVE: Record<Rating, string> = {
   B: 'border-sky-400 bg-sky-400 text-[#0f1117]',
   C: 'border-[#a0a8c8] bg-[#a0a8c8] text-[#0f1117]',
 }
-
-const CHIP_INACTIVE =
-  'border-[#2a2d3e] bg-transparent text-[#a0a8c0] hover:bg-[#202437]'
+const CHIP_INACTIVE = 'border-[#2a2d3e] bg-transparent text-[#a0a8c0] hover:bg-[#202437]'
 const CHIP_DAYS_ACTIVE = 'border-[#7b8cde] bg-[#7b8cde] text-white'
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -31,13 +31,21 @@ export function ReleasedSection({
   selectedDays: number
 }) {
   const [selected, setSelected] = useState<Set<Rating>>(new Set())
+  const [visibleCount, setVisibleCount] = useState(INITIAL)
 
-  const toggle = (r: Rating) =>
+  const toggle = (r: Rating) => {
     setSelected((prev) => {
       const next = new Set(prev)
       next.has(r) ? next.delete(r) : next.add(r)
       return next
     })
+    setVisibleCount(INITIAL)
+  }
+
+  const clearFilter = () => {
+    setSelected(new Set())
+    setVisibleCount(INITIAL)
+  }
 
   const filtered = useMemo(
     () =>
@@ -46,6 +54,10 @@ export function ReleasedSection({
         : allGames.filter((g) => g.rating && selected.has(g.rating as Rating)),
     [allGames, selected],
   )
+
+  const visible = filtered.slice(0, visibleCount)
+  const remaining = filtered.length - visibleCount
+  const nextBatch = Math.min(STEP, remaining)
 
   return (
     <section className="mt-5">
@@ -62,7 +74,6 @@ export function ReleasedSection({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* ── Rating multi-select ── */}
           {RATINGS.map((r) => (
             <button
               key={r}
@@ -79,7 +90,7 @@ export function ReleasedSection({
           {selected.size > 0 && (
             <button
               type="button"
-              onClick={() => setSelected(new Set())}
+              onClick={clearFilter}
               className="rounded-full border border-dashed border-[#3a3d55] px-2.5 py-1 text-xs text-[#5a6080] transition hover:border-[#7b8cde] hover:text-[#7b8cde]"
             >
               清除
@@ -88,7 +99,6 @@ export function ReleasedSection({
 
           <span className="hidden h-5 w-px bg-[#2a2d3e] sm:block" />
 
-          {/* ── Days (href → server refetch) ── */}
           {DAY_OPTIONS.map((d) => (
             <a
               key={d}
@@ -105,15 +115,29 @@ export function ReleasedSection({
 
       {/* ── Grid ── */}
       <div className="rounded-b-lg border-x border-b border-[#2a2d3e] bg-[#11141f] p-4">
-        {filtered.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {filtered.map((game) => (
-              <ReleasedCard key={game.id} game={game} />
-            ))}
-          </div>
+        {visible.length ? (
+          <>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+              {visible.map((game) => (
+                <ReleasedCard key={game.id} game={game} />
+              ))}
+            </div>
+
+            {remaining > 0 && (
+              <div className="mt-5 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setVisibleCount((c) => c + STEP)}
+                  className="rounded-full border border-[#2a2d3e] bg-[#1a1d2e] px-6 py-2 text-sm text-[#a0a8c0] transition hover:border-[#7b8cde] hover:text-[#7b8cde]"
+                >
+                  再看 {nextBatch} 款 <span className="text-[#5a6080]">（还剩 {remaining}）</span>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="grid min-h-40 place-items-center rounded-lg border border-dashed border-[#2a2d3e] text-sm text-[#7a8099]">
-            暂无{[...selected].join('/')} 级已发售游戏
+            暂无{selected.size > 0 ? ` ${[...selected].join('/')} 级` : ''}已发售游戏
           </div>
         )}
       </div>
