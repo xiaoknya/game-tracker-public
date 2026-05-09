@@ -114,7 +114,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
         </div>
         {/* Playtime badge top-right */}
         {playtimeLabel && (
-          <div className="absolute right-2 top-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+          <div className="absolute right-2 top-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[13px] font-bold text-white backdrop-blur-sm">
             {playtimeLabel}
           </div>
         )}
@@ -134,10 +134,10 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
                 style={{ width: `${positiveRate}%`, backgroundColor: reviewBarColor }}
               />
             </div>
-            <span className="shrink-0 text-[11px] font-bold" style={{ color: reviewBarColor }}>
+            <span className="shrink-0 text-[13px] font-bold" style={{ color: reviewBarColor }}>
               {positiveRate}% Positive
             </span>
-            <span className="shrink-0 text-[10px] text-[#4a5070]">
+            <span className="shrink-0 text-[13px] text-[#4a5070]">
               {fmtCount(game.steam_review_total)}
             </span>
           </div>
@@ -149,7 +149,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded border border-[#2a2d3e] bg-[#0b0e16] px-1.5 py-0.5 text-[10px] text-[#5a6080]"
+                className="rounded border border-[#2a2d3e] bg-[#0b0e16] px-1.5 py-0.5 text-[13px] text-[#5a6080]"
               >
                 {tag}
               </span>
@@ -164,13 +164,13 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
               <div key={topic.title} className="grid items-center gap-x-1.5" style={{ gridTemplateColumns: "16px 1fr 52px 30px" }}>
                 {/* Sentiment icon */}
                 <span
-                  className="text-center text-[11px] leading-none"
+                  className="text-center text-[13px] leading-none"
                   style={{ color: sentimentColor(topic.sentiment) }}
                 >
                   {sentimentEmoji(topic.sentiment)}
                 </span>
                 {/* Topic name */}
-                <span className="truncate text-[12px] text-[#a0a8c0]">{topic.title}</span>
+                <span className="truncate text-[13px] text-[#a0a8c0]">{topic.title}</span>
                 {/* Mini bar */}
                 <div className="h-1 overflow-hidden rounded-full bg-[#0b0e16]">
                   <div
@@ -182,7 +182,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
                   />
                 </div>
                 {/* Pct */}
-                <span className="text-right font-mono text-[10px] text-[#4a5070]">~{topic.pct}%</span>
+                <span className="text-right font-mono text-[13px] text-[#4a5070]">~{topic.pct}%</span>
               </div>
             ))}
           </div>
@@ -192,7 +192,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
         {topLangs.length > 0 && (
           <div className="mt-2 flex gap-3 border-t border-[#0b0e16] pt-2">
             {topLangs.map(({ code, pct }) => (
-              <span key={code} className="flex items-center gap-1 text-[11px] text-[#5a6080]">
+              <span key={code} className="flex items-center gap-1 text-[13px] text-[#5a6080]">
                 <span className="text-[13px]">{LANG_FLAG[code] ?? "🌐"}</span>
                 ~{pct}%
               </span>

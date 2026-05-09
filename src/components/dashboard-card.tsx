@@ -54,7 +54,7 @@ export function DashboardCard({ game }: { game: Game }) {
       </div>
 
       {/* ── Meta ── */}
-      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] text-[#7a8099]">
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-[#7a8099]">
         <span className="flex items-center gap-1">
           📅 {releaseDate(game.release_date, game.release_date_is_fuzzy)}
         </span>
@@ -87,13 +87,13 @@ export function DashboardCard({ game }: { game: Game }) {
       {(tags.length > 0 || isFree || needsMod) && (
         <div className="mt-2 flex flex-wrap gap-1">
           {isFree && (
-            <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[11px] text-emerald-400">Free</span>
+            <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[13px] text-emerald-400">Free</span>
           )}
           {needsMod && (
-            <span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[11px] text-red-400">需要修改器</span>
+            <span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[13px] text-red-400">需要修改器</span>
           )}
           {tags.map((tag) => (
-            <span key={tag} className="rounded bg-[#0b0e16] px-1.5 py-0.5 text-[11px] text-[#7a8099]">
+            <span key={tag} className="rounded bg-[#0b0e16] px-1.5 py-0.5 text-[13px] text-[#7a8099]">
               {tag}
             </span>
           ))}
@@ -115,7 +115,7 @@ function StatBox({
     : "text-[#c0c8e0]";
   return (
     <div className="rounded-lg bg-[#0b0e16] p-2 text-center">
-      <div className="text-[11px] text-[#5a6080]">{label}</div>
+      <div className="text-[13px] text-[#5a6080]">{label}</div>
       <div className={`mt-1 font-mono text-[14px] font-semibold ${valueColor}`}>{value}</div>
     </div>
   );
@@ -127,7 +127,7 @@ function ExtLink({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="flex items-center gap-0.5 rounded border border-[#2a2d3e] bg-[#0b0e16] px-2 py-[3px] text-[11px] text-[#7a8099] transition hover:border-[#7b8cde]/60 hover:text-[#7b8cde]"
+      className="flex items-center gap-0.5 rounded border border-[#2a2d3e] bg-[#0b0e16] px-2 py-[3px] text-[13px] text-[#7a8099] transition hover:border-[#7b8cde]/60 hover:text-[#7b8cde]"
     >
       {label} <ExternalLink className="size-3 shrink-0" />
     </a>

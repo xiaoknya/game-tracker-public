@@ -123,17 +123,17 @@ export default async function GameDetailPage({
             {tags.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {tags.map((tag) => (
-                  <span key={tag} className="rounded bg-[#1c1f35] px-2 py-1 text-[11px] text-[#7a8099]">
+                  <span key={tag} className="rounded bg-[#1c1f35] px-2 py-1 text-[12px] text-[#7a8099]">
                     {tag}
                   </span>
                 ))}
                 {game.is_free ? (
-                  <span className="rounded bg-emerald-400/10 px-2 py-1 text-[11px] text-emerald-400">
+                  <span className="rounded bg-emerald-400/10 px-2 py-1 text-[12px] text-emerald-400">
                     免费游戏
                   </span>
                 ) : null}
                 {game.modifier_adaptation_required && (
-                  <span className="rounded bg-amber-400/10 px-2 py-1 text-[11px] text-amber-400">
+                  <span className="rounded bg-amber-400/10 px-2 py-1 text-[12px] text-amber-400">
                     需 Mod 适配
                   </span>
                 )}
@@ -288,10 +288,10 @@ export default async function GameDetailPage({
               <div className="flex items-start justify-between gap-4">
                 <SectionHeader eyebrow="Review Insight · AI" title="玩家评测摘要" />
                 <div className="shrink-0 text-right">
-                  <div className="text-[10px] text-[#4a5070]">
+                  <div className="text-[12px] text-[#4a5070]">
                     {reviewSummary.review_count.toLocaleString()} 条评测
                   </div>
-                  <div className="text-[10px] text-[#4a5070]">
+                  <div className="text-[12px] text-[#4a5070]">
                     {reviewSummary.generated_at?.slice(0, 10)}
                   </div>
                 </div>
@@ -321,14 +321,14 @@ export default async function GameDetailPage({
               {/* Review tags */}
               {reviewSummary.tags && reviewSummary.tags.length > 0 && (
                 <div className="mt-4">
-                  <div className="mb-2 text-[10px] uppercase tracking-widest text-[#4a5070]">
+                  <div className="mb-2 text-[12px] uppercase tracking-widest text-[#4a5070]">
                     高频词
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {reviewSummary.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full bg-[#1c1f35] px-2.5 py-1 text-[11px] text-[#7a8099]"
+                        className="rounded-full bg-[#1c1f35] px-2.5 py-1 text-[12px] text-[#7a8099]"
                       >
                         {tag}
                       </span>
@@ -408,7 +408,7 @@ export default async function GameDetailPage({
                     <span className="font-mono text-[#5a6080]">{item.month?.slice(0, 7)}</span>
                     <span className="font-mono text-[#c0c8e0]">{compactNumber(item.new_reviews)}</span>
                     {item.positive_rate != null && (
-                      <span className={`font-mono text-[10px] ${item.positive_rate >= 0.8 ? "text-emerald-400" : item.positive_rate >= 0.6 ? "text-[#7b8cde]" : "text-rose-400"}`}>
+                      <span className={`font-mono text-[12px] ${item.positive_rate >= 0.8 ? "text-emerald-400" : item.positive_rate >= 0.6 ? "text-[#7b8cde]" : "text-rose-400"}`}>
                         {Math.round(item.positive_rate * 100)}%
                       </span>
                     )}
@@ -441,7 +441,7 @@ export default async function GameDetailPage({
                         <p className="line-clamp-2 text-xs font-medium text-[#c0c8e0] leading-snug">{item.name}</p>
                         <div className="mt-1 flex items-center gap-1.5">
                           <RatingBadge rating={item.rating} className="text-[9px] px-1 py-0" />
-                          <span className="font-mono text-[10px] text-[#5a6080]">{compactNumber(item.followers)}</span>
+                          <span className="font-mono text-[12px] text-[#5a6080]">{compactNumber(item.followers)}</span>
                         </div>
                       </div>
                     </Link>
@@ -469,7 +469,7 @@ function SectionHeader({
 }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-[0.18em] text-[#7b8cde]">{eyebrow}</div>
+      <div className="text-[12px] uppercase tracking-[0.18em] text-[#7b8cde]">{eyebrow}</div>
       <h2 className={`mt-0.5 font-semibold text-[#e0e4f0] ${compact ? "text-sm" : "text-base"}`}>{title}</h2>
     </div>
   );
@@ -488,9 +488,9 @@ function StatCell({
 }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wider text-[#4a5070]">{label}</div>
+      <div className="text-[12px] uppercase tracking-wider text-[#4a5070]">{label}</div>
       <div className={`mt-1 font-mono text-2xl font-semibold ${valueClass ?? "text-[#e0e4f0]"}`}>{value}</div>
-      {sub && <div className="mt-0.5 text-[11px] text-[#5a6080]">{sub}</div>}
+      {sub && <div className="mt-0.5 text-[12px] text-[#5a6080]">{sub}</div>}
     </div>
   );
 }
