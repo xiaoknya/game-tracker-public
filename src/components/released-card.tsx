@@ -95,10 +95,10 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
   return (
     <Link
       href={`/games/${game.id}`}
-      className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
+      className={`group block cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] ${glowClass}`}
     >
-      {/* ── Cover — outer card's overflow-hidden handles clipping ── */}
-      <div className="relative bg-[#1a1d2e]" style={{ aspectRatio: "460/215" }}>
+      {/* ── Cover with negative margins — same bleed technique as GameCard ── */}
+      <div className="-mx-3 -mt-3 mb-2.5 overflow-hidden rounded-t-xl bg-gradient-to-br from-[#0b0e16] to-[#0f1117] relative" style={{ aspectRatio: "460/215" }}>
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -121,7 +121,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       </div>
 
       {/* ── Body ── */}
-      <div className="px-3 pb-3 pt-2.5">
+      <div>
         {/* Game name */}
         <h3 className="line-clamp-1 text-[14px] font-bold text-[#e0e4f0]">{game.name}</h3>
 
