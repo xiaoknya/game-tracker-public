@@ -24,9 +24,9 @@ export function DashboardCard({ game }: { game: Game }) {
       href={`/games/${game.id}`}
       className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#12152b] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
     >
-      {/* ── Cover image — bg matches card so no gap on hover ── */}
+      {/* ── Cover image — outer card's overflow-hidden handles clipping ── */}
       <div
-        className="relative overflow-hidden bg-[#12152b]"
+        className="relative bg-[#12152b]"
         style={{ height: "158px" }}
       >
         {image ? (

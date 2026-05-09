@@ -97,8 +97,8 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       href={`/games/${game.id}`}
       className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#12152b] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
     >
-      {/* ── Cover — bg matches card so no gap on hover ── */}
-      <div className="relative overflow-hidden bg-[#12152b]" style={{ aspectRatio: "460/215" }}>
+      {/* ── Cover — outer card's overflow-hidden handles clipping ── */}
+      <div className="relative bg-[#12152b]" style={{ aspectRatio: "460/215" }}>
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
