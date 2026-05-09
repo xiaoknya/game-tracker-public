@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-} from 'recharts'
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from 'recharts'
 
 import {
   ChartContainer,
@@ -25,8 +20,8 @@ const chartConfig = {
 export function ScoreRadar({ latestScore }: { latestScore: Score | undefined }) {
   const data = [
     { axis: 'Followers', value: Number(latestScore?.score_followers ?? 0) },
-    { axis: 'Bilibili', value: Number(latestScore?.score_bilibili ?? 0) },
-    { axis: 'MOD', value: Number(latestScore?.score_mod ?? 0) },
+    { axis: 'Bilibili',  value: Number(latestScore?.score_bilibili  ?? 0) },
+    { axis: 'MOD',       value: Number(latestScore?.score_mod       ?? 0) },
     {
       axis: 'Reddit',
       value: Number(latestScore?.score_reddit ?? latestScore?.score_baidu ?? 0),
@@ -37,21 +32,25 @@ export function ScoreRadar({ latestScore }: { latestScore: Score | undefined }) 
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto w-full max-w-[260px] aspect-square"
+      className="mx-auto aspect-square max-h-[260px] w-full"
     >
-      <RadarChart data={data} margin={{ top: 12, right: 24, bottom: 12, left: 24 }}>
+      <RadarChart data={data}>
+        <ChartTooltip
+          cursor={false}
+          content={<ChartTooltipContent formatter={(v) => [Number(v).toFixed(2), '分']} />}
+        />
         <PolarGrid stroke="#2a2d3e" />
         <PolarAngleAxis
           dataKey="axis"
-          tick={{ fill: '#7a8099', fontSize: 10 }}
+          tick={{ fill: '#7a8099', fontSize: 11 }}
         />
-        <ChartTooltip content={<ChartTooltipContent nameKey="axis" />} />
         <Radar
           dataKey="value"
-          stroke="rgb(123,140,222)"
-          fill="rgba(123,140,222,0.18)"
-          strokeWidth={1.5}
-          dot={{ fill: 'rgb(123,140,222)', r: 3, strokeWidth: 0 }}
+          fill="var(--color-value)"
+          fillOpacity={0.25}
+          stroke="var(--color-value)"
+          strokeWidth={2}
+          dot={{ r: 4, fillOpacity: 1 }}
         />
       </RadarChart>
     </ChartContainer>

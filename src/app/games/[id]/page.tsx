@@ -5,7 +5,7 @@ import { ArrowLeft, ExternalLink, Globe, Users } from "lucide-react";
 import { AppShell, MobileNav } from "@/components/app-shell";
 import { FollowersTrend } from "@/components/charts/followers-trend";
 import { ReviewTrend } from "@/components/charts/review-trend";
-import { RadarChart } from "@/components/radar-chart";
+import { ScoreRadar } from "@/components/charts/score-radar";
 import { RatingBadge } from "@/components/rating-badge";
 import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
@@ -253,7 +253,7 @@ export default async function GameDetailPage({
               <ScoreInfo />
             </div>
             <div className="mt-4 grid gap-4 sm:grid-cols-[auto_1fr] items-center">
-              <RadarChart latestScore={latestScore} />
+              <ScoreRadar latestScore={latestScore} />
               <div className="space-y-2">
                 {[
                   { label: "Followers", val: latestScore?.score_followers },
