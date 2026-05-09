@@ -32,7 +32,7 @@ export function ScoreRadar({ latestScore }: { latestScore: Score | undefined }) 
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto aspect-square max-h-[260px] w-full"
+      className="aspect-square h-[260px] w-[260px]"
     >
       <RadarChart data={data}>
         <ChartTooltip

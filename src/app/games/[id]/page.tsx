@@ -252,7 +252,7 @@ export default async function GameDetailPage({
               <SectionHeader eyebrow="Score Radar" title="五维评分" />
               <ScoreInfo />
             </div>
-            <div className="mt-4 grid gap-4 sm:grid-cols-[auto_1fr] items-center">
+            <div className="mt-4 grid gap-4 sm:grid-cols-[260px_1fr] items-center">
               <ScoreRadar latestScore={latestScore} />
               <div className="space-y-2">
                 {[
