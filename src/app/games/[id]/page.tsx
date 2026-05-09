@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink, Globe, Users } from "lucide-react";
 
 import { AppShell, MobileNav } from "@/components/app-shell";
-import { RadarChart } from "@/components/radar-chart";
+import { FollowersTrend } from "@/components/charts/followers-trend";
+import { ReviewTrend } from "@/components/charts/review-trend";
+import { ScoreRadar } from "@/components/charts/score-radar";
 import { RatingBadge } from "@/components/rating-badge";
-import { ReviewBarChart } from "@/components/review-bar-chart";
 import { SentimentRing } from "@/components/sentiment-ring";
-import { Sparkline } from "@/components/sparkline";
 import { buttonVariants } from "@/components/ui/button";
 import { gameApi, steamCover, type ReleasedGame } from "@/lib/api";
 import {
@@ -241,13 +241,7 @@ export default async function GameDetailPage({
           <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
             <SectionHeader eyebrow="Trendline" title="Followers 趋势（45天）" />
             <div className="mt-4">
-              <Sparkline snapshots={snapshots} className="h-36 w-full" />
-              {snapshots.length > 0 && (
-                <div className="mt-2 flex justify-between text-[10px] text-[#4a5070] font-mono">
-                  <span>{snapshots[0]?.snapshot_date?.slice(0, 10)}</span>
-                  <span>{snapshots.at(-1)?.snapshot_date?.slice(0, 10)}</span>
-                </div>
-              )}
+              <FollowersTrend snapshots={snapshots} />
             </div>
           </section>
 
@@ -255,7 +249,7 @@ export default async function GameDetailPage({
           <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
             <SectionHeader eyebrow="Score Radar" title="五维评分" />
             <div className="mt-4 grid gap-4 sm:grid-cols-[auto_1fr] items-center">
-              <RadarChart latestScore={latestScore} />
+              <ScoreRadar latestScore={latestScore} />
               <div className="space-y-2">
                 {[
                   { label: "Followers", val: latestScore?.score_followers },
@@ -275,7 +269,7 @@ export default async function GameDetailPage({
             <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
               <SectionHeader eyebrow="Review Trend" title="月度评测趋势" />
               <div className="mt-4">
-                <ReviewBarChart data={reviewMonthly} />
+                <ReviewTrend data={reviewMonthly} />
               </div>
             </section>
           )}
