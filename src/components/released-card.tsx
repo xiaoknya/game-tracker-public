@@ -95,10 +95,10 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
   return (
     <Link
       href={`/games/${game.id}`}
-      className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#12152b] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
+      className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
     >
       {/* ── Cover — outer card's overflow-hidden handles clipping ── */}
-      <div className="relative bg-[#12152b]" style={{ aspectRatio: "460/215" }}>
+      <div className="relative bg-[#1a1d2e]" style={{ aspectRatio: "460/215" }}>
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -128,7 +128,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
         {/* ── Good-rate bar ── */}
         {positiveRate != null && (
           <div className="mt-2 flex items-center gap-2">
-            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#1c1f35]">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#0b0e16]">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${positiveRate}%`, backgroundColor: reviewBarColor }}
@@ -149,7 +149,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
             {tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded border border-[#2a2d3e] bg-[#0f1220] px-1.5 py-0.5 text-[10px] text-[#5a6080]"
+                className="rounded border border-[#2a2d3e] bg-[#0b0e16] px-1.5 py-0.5 text-[10px] text-[#5a6080]"
               >
                 {tag}
               </span>
@@ -159,7 +159,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
 
         {/* ── AI topics ── */}
         {topTopics.length > 0 && (
-          <div className="mt-2.5 space-y-1.5 border-t border-[#1c1f35] pt-2.5">
+          <div className="mt-2.5 space-y-1.5 border-t border-[#0b0e16] pt-2.5">
             {topTopics.map((topic) => (
               <div key={topic.title} className="grid items-center gap-x-1.5" style={{ gridTemplateColumns: "16px 1fr 52px 30px" }}>
                 {/* Sentiment icon */}
@@ -172,7 +172,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
                 {/* Topic name */}
                 <span className="truncate text-[12px] text-[#a0a8c0]">{topic.title}</span>
                 {/* Mini bar */}
-                <div className="h-1 overflow-hidden rounded-full bg-[#1c1f35]">
+                <div className="h-1 overflow-hidden rounded-full bg-[#0b0e16]">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -190,7 +190,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
 
         {/* ── Language distribution ── */}
         {topLangs.length > 0 && (
-          <div className="mt-2 flex gap-3 border-t border-[#1c1f35] pt-2">
+          <div className="mt-2 flex gap-3 border-t border-[#0b0e16] pt-2">
             {topLangs.map(({ code, pct }) => (
               <span key={code} className="flex items-center gap-1 text-[11px] text-[#5a6080]">
                 <span className="text-[13px]">{LANG_FLAG[code] ?? "🌐"}</span>
