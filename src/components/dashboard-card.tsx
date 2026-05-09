@@ -150,7 +150,6 @@ function ExtLink({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noreferrer"
-      onClick={(e) => e.stopPropagation()}
       className="flex items-center gap-0.5 rounded border border-[#2a2d3e] bg-[#0f1220] px-2 py-0.5 text-[10px] text-[#5a6080] transition hover:border-[#7b8cde]/50 hover:text-[#7b8cde]"
     >
       {label} <ExternalLink className="size-2.5" />
