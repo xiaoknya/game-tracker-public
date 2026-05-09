@@ -1,0 +1,22 @@
+services:
+  web:
+    image: ${WEB_IMAGE:?WEB_IMAGE must be set}
+    restart: unless-stopped
+    environment:
+      GAME_TRACKER_API_BASE: http://backend:8000/api
+      TZ: Asia/Shanghai
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - default
+      - game_tracker_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+networks:
+  game_tracker_net:
+    external: true
+    name: game-tracker_default

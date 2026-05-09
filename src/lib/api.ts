@@ -104,7 +104,7 @@ export interface SimilarGame {
 }
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_GAME_TRACKER_API_BASE?.replace(/\/$/, "") ??
+  process.env.GAME_TRACKER_API_BASE?.replace(/\/$/, "") ??
   "http://localhost:8000/api";
 
 type QueryValue = string | number | boolean | null | undefined;
