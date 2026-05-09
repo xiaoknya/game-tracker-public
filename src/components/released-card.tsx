@@ -97,15 +97,15 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       href={`/games/${game.id}`}
       className={`group block overflow-hidden rounded-xl border border-[#2a2d3e] bg-[#12152b] shadow-[0_6px_24px_rgba(2,6,23,0.45)] transition-all duration-200 hover:-translate-y-0.5 ${glowClass}`}
     >
-      {/* ── Cover ── */}
-      <div className="relative overflow-hidden bg-[#0b0e16]" style={{ aspectRatio: "460/215" }}>
+      {/* ── Cover — bg matches card so no gap on hover ── */}
+      <div className="relative overflow-hidden bg-[#12152b]" style={{ aspectRatio: "460/215" }}>
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image}
             alt=""
             loading="lazy"
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+            className="block h-full w-full object-cover transition duration-300 will-change-transform group-hover:scale-[1.04]"
           />
         ) : null}
         {/* Rating badge top-left */}
@@ -123,7 +123,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       {/* ── Body ── */}
       <div className="px-3 pb-3 pt-2.5">
         {/* Game name */}
-        <h3 className="line-clamp-1 text-[13px] font-bold text-[#e0e4f0]">{game.name}</h3>
+        <h3 className="line-clamp-1 text-[14px] font-bold text-[#e0e4f0]">{game.name}</h3>
 
         {/* ── Good-rate bar ── */}
         {positiveRate != null && (
@@ -170,7 +170,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
                   {sentimentEmoji(topic.sentiment)}
                 </span>
                 {/* Topic name */}
-                <span className="truncate text-[11px] text-[#a0a8c0]">{topic.title}</span>
+                <span className="truncate text-[12px] text-[#a0a8c0]">{topic.title}</span>
                 {/* Mini bar */}
                 <div className="h-1 overflow-hidden rounded-full bg-[#1c1f35]">
                   <div

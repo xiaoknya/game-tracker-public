@@ -5,6 +5,9 @@ import { gameApi } from "@/lib/api";
 
 const dayOptions = [30, 60, 90, 180];
 
+// S > A > B > C，同评级按发售日降序（与 Vue 版一致）
+const RATING_ORDER: Record<string, number> = { S: 0, A: 1, B: 2, C: 3 };
+
 export default async function ReleasedPage({
   searchParams,
 }: {
@@ -12,7 +15,13 @@ export default async function ReleasedPage({
 }) {
   const params = await searchParams;
   const selectedDays = Number(params.days ?? 60);
-  const games = await gameApi.listReleased(Number.isFinite(selectedDays) ? selectedDays : 60);
+  const rawGames = await gameApi.listReleased(Number.isFinite(selectedDays) ? selectedDays : 60);
+
+  const games = [...rawGames].sort((a, b) => {
+    const ratingGap = (RATING_ORDER[a.rating ?? ""] ?? 9) - (RATING_ORDER[b.rating ?? ""] ?? 9);
+    if (ratingGap !== 0) return ratingGap;
+    return (b.release_date ?? "").localeCompare(a.release_date ?? "");
+  });
 
   return (
     <AppShell activePath="/released">
@@ -45,4 +54,3 @@ export default async function ReleasedPage({
     </AppShell>
   );
 }
-
