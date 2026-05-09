@@ -1,5 +1,5 @@
 import { AppShell, MobileNav } from "@/components/app-shell";
-import { DashboardCard } from "@/components/dashboard-card";
+import { ReleasedCard } from "@/components/released-card";
 import { FilterChip, SectionPanel } from "@/components/section-panel";
 import { gameApi } from "@/lib/api";
 
@@ -33,7 +33,7 @@ export default async function ReleasedPage({
         {games.length ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {games.map((game) => (
-              <DashboardCard key={game.id} game={game} />
+              <ReleasedCard key={game.id} game={game} />
             ))}
           </div>
         ) : (
