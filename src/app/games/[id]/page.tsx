@@ -297,25 +297,9 @@ export default async function GameDetailPage({
                 </div>
               </div>
 
-              {/* Topics */}
+              {/* Topics — 3-column layout */}
               {reviewSummary.topics && reviewSummary.topics.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  {reviewSummary.topics.map((topic) => (
-                    <article
-                      key={topic.title}
-                      className="rounded-lg border border-[#1e2235] bg-[#0f1220] p-3.5"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <h3 className="text-sm font-semibold text-[#d9def0]">{topic.title}</h3>
-                        <div className="flex shrink-0 items-center gap-1.5">
-                          <SentimentDot sentiment={topic.sentiment} />
-                          <span className="font-mono text-xs text-[#7b8cde]">{topic.pct}%</span>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-[#8090b0]">{topic.description}</p>
-                    </article>
-                  ))}
-                </div>
+                <ReviewTopicsGrid topics={reviewSummary.topics} />
               )}
 
               {/* Review tags */}
@@ -608,5 +592,95 @@ function SentimentDot({ sentiment }: { sentiment: string }) {
   };
   return (
     <span className={`inline-block h-2 w-2 rounded-full ${colors[sentiment] ?? "bg-[#4a5070]"}`} />
+  );
+}
+
+// ─── Review topics three-column grid ─────────────────────────────────────────
+
+import type { ReviewTopic, ReviewSentiment } from "@/lib/api";
+
+const POS_SENTIMENTS = new Set<ReviewSentiment>(["strongly_positive", "positive"]);
+const NEG_SENTIMENTS = new Set<ReviewSentiment>(["negative", "strongly_negative"]);
+
+const SENTIMENT_LABEL: Record<ReviewSentiment, string> = {
+  strongly_positive: "强烈好评",
+  positive: "好评",
+  mixed: "褒贬不一",
+  negative: "差评",
+  strongly_negative: "强烈差评",
+};
+
+const SENTIMENT_COLOR: Record<ReviewSentiment, string> = {
+  strongly_positive: "#52c41a",
+  positive: "#7cdb6a",
+  mixed: "#ffc53d",
+  negative: "#ff7a45",
+  strongly_negative: "#ff4d4f",
+};
+
+function TopicCard({ topic }: { topic: ReviewTopic }) {
+  const color = SENTIMENT_COLOR[topic.sentiment] ?? "#888";
+  return (
+    <article className="rounded-lg border border-[#1e2235] bg-[#0f1220] p-3">
+      <div className="flex items-center justify-between gap-2 mb-1.5">
+        <span
+          className="rounded px-1.5 py-0.5 text-[11px] font-semibold"
+          style={{ backgroundColor: `${color}22`, color }}
+        >
+          {SENTIMENT_LABEL[topic.sentiment]}
+        </span>
+        <span className="text-[12px] font-semibold" style={{ color }}>
+          {topic.pct}%
+        </span>
+      </div>
+      <h3 className="text-[13px] font-semibold text-[#d9def0]">{topic.title}</h3>
+      <p className="mt-1.5 text-[12px] leading-[1.6] text-[#7a8099]">{topic.description}</p>
+      {/* Progress bar */}
+      <div className="mt-2 h-1 overflow-hidden rounded-full bg-[#1c1f35]">
+        <div
+          className="h-full rounded-full"
+          style={{ width: `${Math.min(topic.pct, 100)}%`, backgroundColor: color }}
+        />
+      </div>
+    </article>
+  );
+}
+
+function ReviewTopicsGrid({ topics }: { topics: ReviewTopic[] }) {
+  const pos = topics.filter((t) => POS_SENTIMENTS.has(t.sentiment)).sort((a, b) => b.pct - a.pct);
+  const mix = topics.filter((t) => t.sentiment === "mixed").sort((a, b) => b.pct - a.pct);
+  const neg = topics.filter((t) => NEG_SENTIMENTS.has(t.sentiment)).sort((a, b) => b.pct - a.pct);
+
+  const Col = ({
+    dot,
+    label,
+    items,
+  }: {
+    dot: string;
+    label: string;
+    items: ReviewTopic[];
+  }) => (
+    <div className="space-y-2">
+      <div className="flex items-center gap-1.5 pb-1">
+        <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />
+        <span className="text-[12px] font-semibold text-[#a0a8c0]">{label}</span>
+        <span className="ml-auto text-[11px] text-[#5a6080]">{items.length} 项</span>
+      </div>
+      {items.length > 0 ? (
+        items.map((t) => <TopicCard key={t.title} topic={t} />)
+      ) : (
+        <p className="rounded-lg border border-dashed border-[#1e2235] py-4 text-center text-[12px] text-[#4a5070]">
+          暂无
+        </p>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <Col dot="#52c41a" label="好评" items={pos} />
+      <Col dot="#ffc53d" label="褒贬不一" items={mix} />
+      <Col dot="#ff4d4f" label="差评" items={neg} />
+    </div>
   );
 }

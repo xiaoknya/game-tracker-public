@@ -54,15 +54,12 @@ export function DashboardCard({ game }: { game: Game }) {
       </div>
 
       {/* ── Meta ── */}
-      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-[#7a8099]">
-        <span className="flex items-center gap-1">
+      <div className="mt-2 flex items-center gap-x-2 text-[13px] text-[#7a8099]">
+        <span className="flex shrink-0 items-center gap-1">
           📅 {releaseDate(game.release_date, game.release_date_is_fuzzy)}
         </span>
         {game.days_to_release != null && game.days_to_release > 0 && (
-          <span className="text-[#7b8cde]">（{game.days_to_release} 天后）</span>
-        )}
-        {game.score_date && (
-          <span className="italic text-[#5a6080]">评分: {game.score_date}</span>
+          <span className="shrink-0 text-[#7b8cde]">（{game.days_to_release} 天后）</span>
         )}
       </div>
 

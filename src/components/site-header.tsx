@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Activity, CalendarDays, Disc3 } from "lucide-react";
+import { Disc3 } from "lucide-react";
+
+import { SearchBar } from "@/components/search-bar";
 
 const nav = [
   { href: "/", label: "热度榜" },
@@ -30,10 +32,8 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 text-xs text-white/45">
-          <Activity className="size-4 text-teal-200" />
-          <span className="hidden sm:inline">Public beta</span>
-          <CalendarDays className="size-4 md:hidden" />
+        <div className="flex items-center gap-2">
+          <SearchBar />
         </div>
       </div>
     </header>
