@@ -118,7 +118,7 @@ export function DashboardSection({
       <div className="rounded-b-lg border-x border-b border-[#2a2d3e] bg-[#11141f] p-4">
         {visible.length ? (
           <>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {visible.map((game) => (
                 <DashboardCard key={game.id} game={game} />
               ))}
