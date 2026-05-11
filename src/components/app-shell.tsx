@@ -27,7 +27,7 @@ export function AppShell({
     : titles[activePath] ?? "游戏热度追踪系统";
 
   return (
-    <div className="flex min-h-screen bg-[#0f1117] text-[#e0e4f0]">
+    <div className="flex h-screen overflow-hidden bg-[#0f1117] text-[#e0e4f0]">
       <aside className="hidden w-[188px] shrink-0 border-r border-[#2a2d3e] bg-[#1a1d2e] lg:flex lg:flex-col">
         <Link href="/" className="relative flex h-[60px] items-center gap-2.5 border-b border-[#2a2d3e] px-3.5">
           <span className="grid size-8 place-items-center rounded-md bg-[#252a42] text-[#9aa8ff]">
@@ -59,7 +59,7 @@ export function AppShell({
         </nav>
       </aside>
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 flex flex-col overflow-y-auto">
         <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
           <div className="min-w-0">
             <div className="truncate text-[15px] font-medium text-[#a0a8c0]">{pageTitle}</div>
@@ -72,7 +72,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="px-3 py-4 sm:px-4 lg:px-6 lg:py-6">{children}</main>
+        <main className="flex-1 px-3 py-4 sm:px-4 lg:px-6 lg:py-6">{children}</main>
       </div>
     </div>
   );
