@@ -337,6 +337,9 @@ export default async function GameDetailPage({
                   title={`${game.name} SteamDB 在线人数趋势`}
                   src={`https://steamdb.info/embed/?appid=${game.steam_appid}`}
                   className="block h-[360px] w-full border-0 sm:h-[389px]"
+                  style={{
+                    filter: "invert(0.92) hue-rotate(180deg) saturate(0.85) contrast(0.95) brightness(0.82)",
+                  }}
                   loading="lazy"
                 />
               </div>
