@@ -20,7 +20,6 @@ export function DashboardCard({ game }: { game: Game }) {
   const glowClass = ratingGlow[String(game.rating ?? "")] ?? "hover:border-[#4a527b]";
   // Backend stores these as numbers (0/1) — use Boolean() to avoid JSX rendering literal "0"
   const isFree  = Boolean(game.is_free);
-  const needsMod = Boolean(game.modifier_adaptation_required);
 
   return (
     <Link
@@ -81,13 +80,10 @@ export function DashboardCard({ game }: { game: Game }) {
       </div>
 
       {/* ── Tags ── */}
-      {(tags.length > 0 || isFree || needsMod) && (
+      {(tags.length > 0 || isFree) && (
         <div className="mt-2 flex flex-wrap gap-1">
           {isFree && (
             <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[13px] text-emerald-400">Free</span>
-          )}
-          {needsMod && (
-            <span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[13px] text-red-400">需要修改器</span>
           )}
           {tags.map((tag) => (
             <span key={tag} className="rounded bg-[#0b0e16] px-1.5 py-0.5 text-[13px] text-[#7a8099]">
