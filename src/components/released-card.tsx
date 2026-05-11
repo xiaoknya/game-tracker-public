@@ -98,7 +98,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       className={`group block cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] ${glowClass}`}
     >
       {/* ── Cover with negative margins — same bleed technique as GameCard ── */}
-      <div className="-mx-3 -mt-3 mb-2.5 overflow-hidden rounded-t-xl bg-gradient-to-br from-[#0b0e16] to-[#0f1117] relative" style={{ aspectRatio: "460/215" }}>
+      <div className="-mx-3 -mt-3 mb-2.5 aspect-[2/1] overflow-hidden rounded-t-xl bg-gradient-to-br from-[#0b0e16] to-[#0f1117] relative">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
