@@ -103,6 +103,7 @@ export function SearchBar() {
   };
 
   const activeList = query.trim() ? results : hotGames;
+  const searchHref = query.trim() ? `/search?q=${encodeURIComponent(query.trim())}` : "/search";
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") { close(); return; }
@@ -114,8 +115,12 @@ export function SearchBar() {
       e.preventDefault();
       setCursor((c) => (c - 1 + Math.max(activeList.length, 1)) % Math.max(activeList.length, 1));
     }
-    if (e.key === "Enter" && activeList[cursor]) {
-      router.push(`/games/${activeList[cursor].id}`);
+    if (e.key === "Enter") {
+      if (query.trim()) {
+        router.push(searchHref);
+      } else if (activeList[cursor]) {
+        router.push(`/games/${activeList[cursor].id}`);
+      }
       close();
     }
   };
@@ -197,10 +202,19 @@ export function SearchBar() {
                   <SearchList games={results} cursor={cursor} close={close} heading="搜索结果" />
 
                   {/* Footer hint */}
-                  <div className="flex items-center gap-4 border-t border-[#1e2235] px-4 py-2 text-[11px] text-[#4a5070]">
-                    <span>↑↓ 选择</span>
-                    <span>Enter 跳转</span>
-                    <span>Esc 关闭</span>
+                  <div className="flex items-center justify-between gap-4 border-t border-[#1e2235] px-4 py-2 text-[11px] text-[#4a5070]">
+                    <div className="flex items-center gap-4">
+                      <span>↑↓ 选择</span>
+                      <span>Enter 查看全部</span>
+                      <span>Esc 关闭</span>
+                    </div>
+                    <Link
+                      href={searchHref}
+                      onClick={close}
+                      className="shrink-0 rounded-full border border-[#2a2d3e] px-2.5 py-1 text-[#aeb8e8] transition hover:border-[#7b8cde] hover:text-white"
+                    >
+                      查看全部
+                    </Link>
                   </div>
                 </>
               )}

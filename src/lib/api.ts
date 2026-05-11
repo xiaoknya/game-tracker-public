@@ -142,6 +142,8 @@ export const gameApi = {
     apiGet<Game[]>("/games/fuzzy", { months }, { fallback: [] }),
   listReleased: (days = 90) =>
     apiGet<ReleasedGame[]>("/games/released", { days }, { fallback: [] }),
+  search: (q: string, limit = 60) =>
+    apiGet<Game[]>("/games/search", { q, limit }, { fallback: [], revalidate: 60 }),
   getGame: (id: number) =>
     apiGet<Game | null>(`/games/${id}`, undefined, { fallback: null }),
   getTrend: (id: number, days = 30) =>
@@ -166,4 +168,3 @@ export function steamCover(appid: number | null | undefined) {
   if (!appid) return "";
   return `https://cdn.akamai.steamstatic.com/steam/apps/${appid}/header.jpg`;
 }
-

@@ -13,8 +13,8 @@ const DAY_OPTIONS = [30, 60, 90, 180]
 const INITIAL = 12
 const STEP = 12
 const SORT_OPTIONS = [
-  { key: 'date', label: '发售时间' },
   { key: 'positive', label: '好评率' },
+  { key: 'date', label: '发售时间' },
   { key: 'reviews', label: '评测数' },
   { key: 'playtime', label: '中位时长' },
 ] as const
@@ -39,7 +39,7 @@ export function ReleasedSection({
   selectedDays: number
 }) {
   const [selected, setSelected] = useState<Set<Rating>>(new Set())
-  const [sortBy, setSortBy] = useState<SortKey>('date')
+  const [sortBy, setSortBy] = useState<SortKey>('positive')
   const [opinion, setOpinion] = useState<OpinionFilter>('all')
   const [visibleCount, setVisibleCount] = useState(INITIAL)
 
