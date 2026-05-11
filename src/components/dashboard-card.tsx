@@ -1,10 +1,32 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
-import type { Game } from "@/lib/api";
+import type { Game, Rating } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { compactNumber, releaseDate, score, signedCompact, tagsFromGame } from "@/lib/format";
-import { RatingBadge } from "@/components/rating-badge";
+
+const CORNER_BG: Record<string, string> = {
+  S: '#e11d48',
+  A: '#d97706',
+  B: '#0284c7',
+  C: '#52525b',
+}
+
+function CornerRating({ rating }: { rating: Rating }) {
+  const bg = CORNER_BG[String(rating ?? '')] ?? '#3f3f46'
+  const size = 52
+  return (
+    <div className="absolute left-0 top-0 overflow-hidden rounded-tl-xl" style={{ width: size, height: size }}>
+      <div
+        className="absolute left-0 top-0 h-0 w-0"
+        style={{ borderTop: `${size}px solid ${bg}`, borderRight: `${size}px solid transparent` }}
+      />
+      <span className="absolute left-1.5 top-1 text-[13px] font-black text-white drop-shadow">
+        {String(rating ?? '—')}
+      </span>
+    </div>
+  )
+}
 
 const ratingGlow: Record<string, string> = {
   S: "hover:border-rose-400/60 hover:shadow-[0_8px_24px_color-mix(in_srgb,#fb7185_22%,transparent)]",
@@ -38,10 +60,7 @@ export function DashboardCard({ game }: { game: Game }) {
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-[#3a3d55]">No image</div>
         )}
-        {/* Rating badge top-left */}
-        <div className="absolute left-2 top-2">
-          <RatingBadge rating={game.rating} className="h-5 min-w-6 rounded px-1 text-[11px]" />
-        </div>
+        <CornerRating rating={game.rating} />
         {/* Bottom fade */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#1a1d2e] to-transparent" />
       </div>

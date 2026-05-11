@@ -1,9 +1,31 @@
 import Link from "next/link";
 
-import type { ReleasedGame, ReviewSentiment, ReviewTopic } from "@/lib/api";
+import type { ReleasedGame, Rating, ReviewSentiment, ReviewTopic } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { tagsFromGame } from "@/lib/format";
-import { RatingBadge } from "@/components/rating-badge";
+
+const CORNER_BG: Record<string, string> = {
+  S: '#e11d48',
+  A: '#d97706',
+  B: '#0284c7',
+  C: '#52525b',
+}
+
+function CornerRating({ rating }: { rating: Rating }) {
+  const bg = CORNER_BG[String(rating ?? '')] ?? '#3f3f46'
+  const size = 52
+  return (
+    <div className="absolute left-0 top-0 overflow-hidden rounded-tl-xl" style={{ width: size, height: size }}>
+      <div
+        className="absolute left-0 top-0 h-0 w-0"
+        style={{ borderTop: `${size}px solid ${bg}`, borderRight: `${size}px solid transparent` }}
+      />
+      <span className="absolute left-1.5 top-1 text-[13px] font-black text-white drop-shadow">
+        {String(rating ?? '—')}
+      </span>
+    </div>
+  )
+}
 
 // ─── Flag emoji map ───────────────────────────────────────────────────────────
 const LANG_FLAG: Record<string, string> = {
@@ -108,10 +130,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
             className="block h-full w-full object-cover transition duration-300 will-change-transform group-hover:scale-[1.04]"
           />
         ) : null}
-        {/* Rating badge top-left */}
-        <div className="absolute left-2 top-2">
-          <RatingBadge rating={game.rating} className="h-6 min-w-7 rounded px-1.5 text-xs" />
-        </div>
+        <CornerRating rating={game.rating} />
         {/* Playtime badge top-right */}
         {playtimeLabel && (
           <div className="absolute right-2 top-2 rounded-full bg-black/65 px-2.5 py-0.5 text-[13px] font-bold text-white backdrop-blur-sm">
