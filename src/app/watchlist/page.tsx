@@ -7,6 +7,8 @@ export const metadata = {
   description: "本地保存的公开版游戏关注列表。",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function WatchlistPage() {
   const [upcomingGames, fuzzyGames, releasedGames] = await Promise.all([
     gameApi.listUpcoming({ days: 180 }),
