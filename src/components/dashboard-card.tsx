@@ -14,7 +14,7 @@ const CORNER_GRADIENT: Record<string, [string, string]> = {
 
 function CornerRating({ rating }: { rating: Rating }) {
   const [c1, c2] = CORNER_GRADIENT[String(rating ?? '')] ?? ['rgba(63,63,70,0.85)', 'rgba(63,63,70,0)']
-  const size = 44
+  const size = 36
   return (
     <div className="absolute left-0 top-0 overflow-hidden rounded-tl-xl" style={{ width: size, height: size }}>
       <div
@@ -25,7 +25,7 @@ function CornerRating({ rating }: { rating: Rating }) {
         }}
       />
       <span
-        className="absolute left-1.5 top-0.5 text-[11px] font-black text-white"
+        className="absolute left-1 top-0.5 text-[10px] font-black text-white"
         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}
       >
         {String(rating ?? '—')}
