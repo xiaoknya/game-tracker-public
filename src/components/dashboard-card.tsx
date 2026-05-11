@@ -57,7 +57,7 @@ export function DashboardCard({ game }: { game: Game }) {
       className={`group block cursor-pointer rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-2 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] sm:rounded-xl sm:p-3 ${glowClass}`}
     >
       {/* ── Cover: aspect-ratio scales with card width ── */}
-      <div className="relative -mx-2 -mt-2 mb-2 aspect-[16/9] overflow-hidden rounded-t-lg bg-gradient-to-br from-[#0b0e16] to-[#0f1117] sm:-mx-3 sm:-mt-3 sm:mb-2.5 sm:aspect-[2/1] sm:rounded-t-xl">
+      <div className="relative -mx-2 -mt-2 mb-2 aspect-[2/1] overflow-hidden rounded-t-lg bg-gradient-to-br from-[#0b0e16] to-[#0f1117] sm:-mx-3 sm:-mt-3 sm:mb-2.5 sm:rounded-t-xl">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -111,8 +111,17 @@ export function DashboardCard({ game }: { game: Game }) {
         <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
       </div>
 
+      <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] sm:hidden">
+        <span className="min-w-0 truncate font-mono text-[#8a91aa]">
+          Followers <span className="text-[#c0c8e0]">{compactNumber(game.followers)}</span>
+        </span>
+        <span className="shrink-0 font-mono font-semibold text-[#7b8cde]">
+          {score(game.total_score)}
+        </span>
+      </div>
+
       {/* ── Stats 3-col ── */}
-      <div className="mt-1.5 grid grid-cols-2 gap-1 sm:mt-2 sm:grid-cols-3 sm:gap-1.5">
+      <div className="mt-1.5 hidden grid-cols-2 gap-1 sm:mt-2 sm:grid sm:grid-cols-3 sm:gap-1.5">
         <StatBox label="Followers" value={compactNumber(game.followers)} />
         <StatBox label="7天增量"  value={signedCompact(delta)} positive={delta > 0} negative={delta < 0} className="hidden sm:block" />
         <StatBox label="综合分"   value={score(game.total_score)} accent />
