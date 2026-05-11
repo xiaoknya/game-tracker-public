@@ -3,10 +3,10 @@ import { cn } from "@/lib/utils";
 import type { Rating } from "@/lib/api";
 
 const tone: Record<string, string> = {
-  S: "border-rose-500 bg-rose-600 text-white shadow-[0_1px_4px_rgba(0,0,0,0.5)]",
-  A: "border-amber-500 bg-amber-500 text-white shadow-[0_1px_4px_rgba(0,0,0,0.5)]",
-  B: "border-sky-500 bg-sky-600 text-white shadow-[0_1px_4px_rgba(0,0,0,0.5)]",
-  C: "border-zinc-500 bg-zinc-600 text-white shadow-[0_1px_4px_rgba(0,0,0,0.4)]",
+  S: "border-rose-400/70 bg-black/70 text-rose-300 backdrop-blur-sm shadow-[0_1px_6px_rgba(0,0,0,0.6)]",
+  A: "border-amber-400/70 bg-black/70 text-amber-300 backdrop-blur-sm shadow-[0_1px_6px_rgba(0,0,0,0.6)]",
+  B: "border-sky-400/70 bg-black/70 text-sky-300 backdrop-blur-sm shadow-[0_1px_6px_rgba(0,0,0,0.6)]",
+  C: "border-zinc-400/50 bg-black/70 text-zinc-300 backdrop-blur-sm shadow-[0_1px_6px_rgba(0,0,0,0.5)]",
 };
 
 export function RatingBadge({
@@ -22,7 +22,7 @@ export function RatingBadge({
       variant="outline"
       className={cn(
         "h-7 min-w-9 justify-center rounded-md border px-2 font-mono text-sm",
-        tone[String(rating ?? "")] ?? "border-zinc-500 bg-zinc-700 text-zinc-300",
+        tone[String(rating ?? "")] ?? "border-zinc-400/40 bg-black/70 text-zinc-400 backdrop-blur-sm",
         className,
       )}
     >
