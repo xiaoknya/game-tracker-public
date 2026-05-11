@@ -54,10 +54,10 @@ export function DashboardCard({ game }: { game: Game }) {
 
   return (
     <article
-      className={`group block cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] ${glowClass}`}
+      className={`group block cursor-pointer rounded-lg border border-[#2a2d3e] bg-[#1a1d2e] p-2 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] sm:rounded-xl sm:p-3 ${glowClass}`}
     >
       {/* ── Cover: aspect-ratio scales with card width ── */}
-      <div className="-mx-3 -mt-3 mb-2.5 aspect-[2/1] overflow-hidden rounded-t-xl bg-gradient-to-br from-[#0b0e16] to-[#0f1117] relative">
+      <div className="relative -mx-2 -mt-2 mb-2 aspect-[16/9] overflow-hidden rounded-t-lg bg-gradient-to-br from-[#0b0e16] to-[#0f1117] sm:-mx-3 sm:-mt-3 sm:mb-2.5 sm:aspect-[2/1] sm:rounded-t-xl">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -78,7 +78,7 @@ export function DashboardCard({ game }: { game: Game }) {
         <WatchlistButton
           gameId={game.id}
           compact
-          className="absolute right-2 top-2 z-20 bg-[#0b0e16]/75 backdrop-blur"
+          className="absolute right-1.5 top-1.5 z-20 bg-[#0b0e16]/75 backdrop-blur sm:right-2 sm:top-2"
         />
         {hasPrice && (
           <PriceBadge
@@ -86,7 +86,7 @@ export function DashboardCard({ game }: { game: Game }) {
             compact
             hideWhenUnknown
             isFreeFallback={isFree}
-            className="pointer-events-none absolute bottom-2 right-2 z-20 border-white/15 bg-[#05070d]/78 px-2 py-1 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur"
+            className="pointer-events-none absolute bottom-1.5 right-1.5 z-20 border-white/15 bg-[#05070d]/78 px-1.5 py-0.5 text-[10px] shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur sm:bottom-2 sm:right-2 sm:px-2 sm:py-1 sm:text-[11px]"
           />
         )}
         {/* Bottom fade */}
@@ -95,15 +95,15 @@ export function DashboardCard({ game }: { game: Game }) {
 
       {/* ── Name ── */}
       <Link href={`/games/${game.id}`} className="block">
-        <h3 className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#e0e4f0] transition group-hover:text-white">
+        <h3 className="line-clamp-2 min-h-[34px] text-[12px] font-semibold leading-[1.35] text-[#e0e4f0] transition group-hover:text-white sm:min-h-0 sm:text-[13px] sm:leading-[1.4]">
           {game.name}
         </h3>
       </Link>
 
       {/* ── Meta ── */}
-      <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-[#7a8099]">
+      <div className="mt-1 flex min-h-[15px] flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-[#7a8099] sm:mt-1.5 sm:text-[11px]">
         <span className="flex shrink-0 items-center gap-0.5">
-          📅 {releaseDate(game.release_date, game.release_date_is_fuzzy)}
+          {releaseDate(game.release_date, game.release_date_is_fuzzy)}
         </span>
         {game.days_to_release != null && game.days_to_release > 0 && (
           <span className="shrink-0 text-[#7b8cde]">（{game.days_to_release}天）</span>
@@ -112,14 +112,14 @@ export function DashboardCard({ game }: { game: Game }) {
       </div>
 
       {/* ── Stats 3-col ── */}
-      <div className="mt-2 grid grid-cols-3 gap-1.5">
+      <div className="mt-1.5 grid grid-cols-2 gap-1 sm:mt-2 sm:grid-cols-3 sm:gap-1.5">
         <StatBox label="Followers" value={compactNumber(game.followers)} />
-        <StatBox label="7天增量"  value={signedCompact(delta)} positive={delta > 0} negative={delta < 0} />
+        <StatBox label="7天增量"  value={signedCompact(delta)} positive={delta > 0} negative={delta < 0} className="hidden sm:block" />
         <StatBox label="综合分"   value={score(game.total_score)} accent />
       </div>
 
       {/* ── External links ── */}
-      <div className="mt-2 flex flex-wrap gap-1">
+      <div className="mt-2 hidden flex-wrap gap-1 sm:flex">
         {game.steamdb_url && <ExtLink href={game.steamdb_url} label="SteamDB" />}
         {game.steam_url   && <ExtLink href={game.steam_url}   label="Steam" />}
         <ExtLink
@@ -130,7 +130,7 @@ export function DashboardCard({ game }: { game: Game }) {
 
       {/* ── Tags ── */}
       {tags.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1">
+        <div className="mt-1.5 hidden flex-wrap gap-1 sm:flex">
           {tags.map((tag) => (
             <span key={tag} className="rounded bg-[#0b0e16] px-1.5 py-0.5 text-[11px] text-[#7a8099]">
               {tag}
@@ -143,9 +143,9 @@ export function DashboardCard({ game }: { game: Game }) {
 }
 
 function StatBox({
-  label, value, positive, negative, accent,
+  label, value, positive, negative, accent, className,
 }: {
-  label: string; value: string; positive?: boolean; negative?: boolean; accent?: boolean;
+  label: string; value: string; positive?: boolean; negative?: boolean; accent?: boolean; className?: string;
 }) {
   const valueColor = positive
     ? "text-emerald-400"
@@ -153,9 +153,9 @@ function StatBox({
     : accent   ? "text-[#7b8cde]"
     : "text-[#c0c8e0]";
   return (
-    <div className="rounded-md bg-[#0b0e16] p-1.5 text-center">
-      <div className="text-[10px] text-[#5a6080]">{label}</div>
-      <div className={`mt-0.5 font-mono text-[12px] font-semibold ${valueColor}`}>{value}</div>
+    <div className={`rounded-md bg-[#0b0e16] px-1 py-1 text-center sm:p-1.5 ${className ?? ""}`}>
+      <div className="text-[9px] text-[#5a6080] sm:text-[10px]">{label}</div>
+      <div className={`mt-0.5 font-mono text-[11px] font-semibold sm:text-[12px] ${valueColor}`}>{value}</div>
     </div>
   );
 }

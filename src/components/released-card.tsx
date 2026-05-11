@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import type { ReleasedGame, Rating, ReviewSentiment, ReviewTopic } from "@/lib/api";
 import { steamCover } from "@/lib/api";
-import { tagsFromGame } from "@/lib/format";
+import { steamPriceLabel, tagsFromGame } from "@/lib/format";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
 import { PriceBadge, hasDisplayablePrice } from "@/components/price-badge";
 
@@ -125,10 +125,77 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
   }
 
   return (
-    <Link
-      href={`/games/${game.id}`}
-      className={`group block cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] ${glowClass}`}
-    >
+    <>
+      <Link
+        href={`/games/${game.id}`}
+        className="group grid min-h-[94px] grid-cols-[124px_1fr] gap-2.5 rounded-lg border border-[#25283a] bg-[#171a29] p-2 transition hover:border-[#3a4058] md:hidden"
+      >
+        <div className="relative aspect-[16/9] overflow-hidden rounded-md bg-[#0b0e16]">
+          {image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={image}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+            />
+          ) : null}
+          <span className="absolute left-1 top-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            {String(game.rating ?? "—")}
+          </span>
+          {playtimeLabel ? (
+            <span className="absolute right-1 top-1 rounded bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              {playtimeLabel}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 py-0.5">
+          <h3 className="line-clamp-2 text-[14px] font-semibold leading-[1.25] text-[#e0e4f0]">
+            {game.name}
+          </h3>
+
+          <div className="mt-1.5 flex min-w-0 items-center gap-1.5">
+            {hasPrice ? (
+              <span className="shrink-0 rounded bg-[#0f1117] px-1.5 py-0.5 text-[11px] font-semibold text-amber-300">
+                {game.primary_price?.discount_percent ? `-${game.primary_price.discount_percent}% ` : ""}
+                {steamPriceLabel(game.primary_price, isFree ? "免费" : "待定")}
+              </span>
+            ) : null}
+            {positiveRate != null ? (
+              <span className="shrink-0 rounded bg-[#0f1117] px-1.5 py-0.5 text-[11px] font-semibold" style={{ color: reviewBarColor }}>
+                {positiveRate}%
+              </span>
+            ) : null}
+            {game.steam_review_total ? (
+              <span className="truncate text-[11px] text-[#5a6080]">{fmtCount(game.steam_review_total)}评测</span>
+            ) : null}
+          </div>
+
+          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-[11px] text-[#6e7590]">
+            {tags.slice(0, 2).map((tag) => (
+              <span key={tag} className="truncate">
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {topTopics.length > 0 ? (
+            <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-[11px] text-[#7a8099]">
+              <span style={{ color: sentimentColor(topTopics[0].sentiment) }}>
+                {sentimentEmoji(topTopics[0].sentiment)}
+              </span>
+              <span className="truncate">{topTopics[0].title}</span>
+              <span className="shrink-0 text-[#4a5070]">~{topTopics[0].pct}%</span>
+            </div>
+          ) : null}
+        </div>
+      </Link>
+
+      <Link
+        href={`/games/${game.id}`}
+        className={`group hidden cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] md:block ${glowClass}`}
+      >
       {/* ── Cover with negative margins — same bleed technique as GameCard ── */}
       <div className="-mx-3 -mt-3 mb-2.5 aspect-[2/1] overflow-hidden rounded-t-xl bg-gradient-to-br from-[#0b0e16] to-[#0f1117] relative">
         {image ? (
@@ -243,6 +310,7 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
           </div>
         )}
       </div>
-    </Link>
+      </Link>
+    </>
   );
 }

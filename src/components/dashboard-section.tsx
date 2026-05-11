@@ -246,10 +246,10 @@ export function DashboardSection({
       )}
 
       {/* ── Grid ── */}
-      <div className="rounded-b-lg border-x border-b border-[#2a2d3e] bg-[#11141f] p-4">
+      <div className="rounded-b-lg border-x border-b border-[#2a2d3e] bg-[#11141f] p-2 sm:p-4">
         {visible.length ? (
           <>
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 md:[grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
               {visible.map((game) => (
                 <DashboardCard key={game.id} game={game} />
               ))}
