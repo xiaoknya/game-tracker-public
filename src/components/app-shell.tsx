@@ -38,7 +38,7 @@ export function AppShell({
           <span className="absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r from-[#7b8cde] to-transparent opacity-60" />
         </Link>
 
-        <nav className="flex-1 px-2 py-2">
+        <nav className="flex-1 overflow-y-auto px-2 py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = activePath === item.href;
@@ -61,9 +61,9 @@ export function AppShell({
       </aside>
 
       <div className="min-w-0 flex-1 flex flex-col overflow-y-auto">
-        <header className="sticky top-0 z-30 flex h-[60px] items-center gap-4 border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="hidden size-8 shrink-0 place-items-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:grid">
+        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="hidden size-8 shrink-0 items-center justify-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:flex">
               <PageIcon className="size-4" />
             </span>
             <div className="min-w-0">
