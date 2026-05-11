@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { ReleasedCard } from '@/components/released-card'
 import type { ReleasedGame } from '@/lib/api'
@@ -42,6 +42,7 @@ export function ReleasedSection({
   const [sortBy, setSortBy] = useState<SortKey>('positive')
   const [opinion, setOpinion] = useState<OpinionFilter>('all')
   const [visibleCount, setVisibleCount] = useState(INITIAL)
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
   const toggle = (r: Rating) => {
     setSelected((prev) => {
@@ -86,7 +87,7 @@ export function ReleasedSection({
 
   const visible = filtered.slice(0, visibleCount)
   const remaining = filtered.length - visibleCount
-  const nextBatch = Math.min(STEP, remaining)
+  const hasMore = remaining > 0
   const hasFilters = selected.size > 0 || opinion !== 'all'
   const opinionStats = useMemo(() => {
     let high = 0
@@ -101,6 +102,23 @@ export function ReleasedSection({
     })
     return { high, mixed, low }
   }, [allGames])
+
+  useEffect(() => {
+    if (!hasMore) return
+    const node = loadMoreRef.current
+    if (!node) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        setVisibleCount((count) => Math.min(count + STEP, filtered.length))
+      },
+      { rootMargin: '360px 0px' },
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [filtered.length, hasMore])
 
   return (
     <section className="mt-5">
@@ -202,17 +220,18 @@ export function ReleasedSection({
               ))}
             </div>
 
-            {remaining > 0 && (
-              <div className="mt-5 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setVisibleCount((c) => c + STEP)}
-                  className="rounded-full border border-[#2a2d3e] bg-[#1a1d2e] px-6 py-2 text-sm text-[#a0a8c0] transition hover:border-[#7b8cde] hover:text-[#7b8cde]"
-                >
-                  再看 {nextBatch} 款 <span className="text-[#5a6080]">（还剩 {remaining}）</span>
-                </button>
+            {hasMore ? (
+              <div ref={loadMoreRef} className="mt-5 grid h-12 place-items-center text-xs text-[#5a6080]">
+                <span className="rounded-full border border-[#2a2d3e] bg-[#1a1d2e] px-4 py-1.5">
+                  继续向下加载 <span className="text-[#7b8cde]">{Math.min(STEP, remaining)}</span> 款
+                  <span className="ml-1 text-[#4a5070]">/ 剩余 {remaining}</span>
+                </span>
               </div>
-            )}
+            ) : filtered.length > INITIAL ? (
+              <div className="mt-5 grid h-10 place-items-center text-xs text-[#4a5070]">
+                已显示全部 {filtered.length} 款
+              </div>
+            ) : null}
           </>
         ) : (
           <div className="grid min-h-40 place-items-center rounded-lg border border-dashed border-[#2a2d3e] text-sm text-[#7a8099]">

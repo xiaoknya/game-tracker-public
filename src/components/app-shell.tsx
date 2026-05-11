@@ -81,7 +81,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-4 lg:px-6 lg:py-6">
+        <main className="scrollbar-gutter-stable min-h-0 flex-1 overflow-y-auto px-3 py-4 sm:px-4 lg:px-6 lg:py-6">
           {children}
         </main>
       </div>

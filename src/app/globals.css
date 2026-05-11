@@ -141,6 +141,10 @@
     text-wrap: balance;
   }
 
+  .scrollbar-gutter-stable {
+    scrollbar-gutter: stable;
+  }
+
   .animate-rise {
     animation: rise 600ms ease both;
   }
