@@ -13,7 +13,6 @@ import { PriceBadge } from "@/components/price-badge";
 import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
 import { WatchlistButton } from "@/components/watchlist-button";
-import { buttonVariants } from "@/components/ui/button";
 import { gameApi, steamCover, type ReleasedGame, type ReviewSentiment, type ReviewTopic } from "@/lib/api";
 import {
   compactNumber,
@@ -95,6 +94,16 @@ export default async function GameDetailPage({
   const latestLangDist =
     reviewMonthly.findLast((m) => m.language_dist)?.language_dist ??
     (releaseGame.language_dist ?? null);
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const isReleased =
+    Boolean(reviewTotal) ||
+    (typeof game.days_to_release === "number"
+      ? game.days_to_release < 0
+      : Boolean(game.release_date && game.release_date <= todayIso));
+  const primaryActionClass =
+    "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#46547e] bg-[#252a42] px-2.5 text-sm font-medium text-[#e4e8ff] transition hover:border-[#6676b0] hover:bg-[#30385d] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b8cde]/60";
+  const secondaryActionClass =
+    "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[#2a2d3e] bg-[#0f1117] px-2.5 text-sm font-medium text-[#d9def0] transition hover:border-[#3a4058] hover:bg-[#202437] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7b8cde]/50";
 
   return (
     <AppShell activePath="/games">
@@ -175,7 +184,7 @@ export default async function GameDetailPage({
                   href={game.steam_url}
                   target="_blank"
                   rel="noreferrer"
-                  className={buttonVariants({ className: "bg-[#7b8cde] text-white hover:bg-[#8fa0ff]" })}
+                  className={primaryActionClass}
                 >
                   Steam <ExternalLink className="size-3.5" />
                 </a>
@@ -185,10 +194,7 @@ export default async function GameDetailPage({
                   href={game.steamdb_url}
                   target="_blank"
                   rel="noreferrer"
-                  className={buttonVariants({
-                    variant: "outline",
-                    className: "border-[#2a2d3e] bg-[#0f1117] text-[#d9def0] hover:bg-[#202437]",
-                  })}
+                  className={secondaryActionClass}
                 >
                   SteamDB <ExternalLink className="size-3.5" />
                 </a>
@@ -201,10 +207,7 @@ export default async function GameDetailPage({
                     href={url}
                     target="_blank"
                     rel="noreferrer"
-                    className={buttonVariants({
-                      variant: "outline",
-                      className: "border-[#2a2d3e] bg-[#0f1117] text-[#d9def0] hover:bg-[#202437] capitalize",
-                    })}
+                    className={`${secondaryActionClass} capitalize`}
                   >
                     {platform} <ExternalLink className="size-3.5" />
                   </a>
@@ -314,6 +317,31 @@ export default async function GameDetailPage({
               </div>
             </section>
           )}
+
+          {/* SteamDB online players */}
+          {isReleased && game.steam_appid ? (
+            <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <SectionHeader eyebrow="Live Players" title="Steam 在线人数趋势" />
+                <a
+                  href={`https://steamdb.info/app/${game.steam_appid}/charts/`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex h-8 w-fit items-center justify-center gap-1.5 rounded-lg border border-[#2a2d3e] bg-[#0f1117] px-2.5 text-sm font-medium text-[#d9def0] transition hover:border-[#3a4058] hover:bg-[#202437] hover:text-white"
+                >
+                  在 SteamDB 查看 <ExternalLink className="size-3.5" />
+                </a>
+              </div>
+              <div className="mt-4 overflow-hidden rounded-lg border border-[#1e2235] bg-[#0b0e16]">
+                <iframe
+                  title={`${game.name} SteamDB 在线人数趋势`}
+                  src={`https://steamdb.info/embed/?appid=${game.steam_appid}`}
+                  className="block h-[360px] w-full border-0 sm:h-[389px]"
+                  loading="lazy"
+                />
+              </div>
+            </section>
+          ) : null}
 
           {/* Language distribution */}
           {latestLangDist && Object.keys(latestLangDist).length > 0 && (

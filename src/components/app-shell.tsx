@@ -1,14 +1,9 @@
 import Link from "next/link";
 import { Bookmark, Calendar, CheckCircle2, Gamepad2, LineChart, Search, Swords } from "lucide-react";
 
+import { navItems } from "@/components/app-nav";
+import { MobileSidebar } from "@/components/mobile-sidebar";
 import { SearchBar } from "@/components/search-bar";
-
-const navItems = [
-  { href: "/", label: "主看板", icon: LineChart },
-  { href: "/released", label: "已发售游戏", icon: CheckCircle2 },
-  { href: "/calendar", label: "发售日历", icon: Calendar },
-  { href: "/watchlist", label: "我的收藏", icon: Bookmark },
-];
 
 const pageMeta: Record<string, { title: string; sub: string; icon: React.ElementType }> = {
   "/":         { title: "主看板",     sub: "即将发售游戏评级",  icon: LineChart    },
@@ -66,6 +61,7 @@ export function AppShell({
       <div className="min-w-0 flex-1 flex flex-col overflow-hidden">
         <header className="z-30 flex h-[60px] shrink-0 items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
+            <MobileSidebar activePath={activePath} />
             <span className="hidden size-8 shrink-0 items-center justify-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:flex">
               <PageIcon className="size-4" />
             </span>
@@ -90,17 +86,5 @@ export function AppShell({
 }
 
 export function MobileNav() {
-  return (
-    <nav className="mb-4 flex gap-2 overflow-x-auto lg:hidden">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className="whitespace-nowrap rounded-md border border-[#2a2d3e] bg-[#1a1d2e] px-3 py-2 text-sm text-[#a0a8c0]"
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  );
+  return null;
 }
