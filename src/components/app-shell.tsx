@@ -61,19 +61,19 @@ export function AppShell({
       </aside>
 
       <div className="min-w-0 flex-1 flex flex-col overflow-y-auto">
-        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
-          <div className="flex min-w-0 items-center gap-3">
+        <header className="sticky top-0 z-30 flex h-[60px] items-center gap-4 border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <span className="hidden size-8 shrink-0 place-items-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:grid">
               <PageIcon className="size-4" />
             </span>
             <div className="min-w-0">
-              <div className="truncate text-[14px] font-semibold text-[#e0e4f0] leading-tight">{meta.title}</div>
+              <div className="truncate text-[14px] font-semibold leading-tight text-[#e0e4f0]">{meta.title}</div>
               {meta.sub && (
-                <div className="truncate text-[11px] text-[#5a6080] leading-tight">{meta.sub}</div>
+                <div className="truncate text-[11px] leading-tight text-[#5a6080]">{meta.sub}</div>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="shrink-0">
             <SearchBar />
           </div>
         </header>
