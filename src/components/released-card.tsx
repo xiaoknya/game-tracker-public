@@ -24,7 +24,7 @@ function CornerRating({ rating }: { rating: Rating }) {
         }}
       />
       <span
-        className="absolute left-1 top-0.5 text-[10px] font-black text-white"
+        className="absolute left-[5px] top-[4px] text-[10px] font-black leading-none text-white"
         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}
       >
         {String(rating ?? '—')}
