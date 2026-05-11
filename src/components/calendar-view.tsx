@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { type Game, steamCover } from '@/lib/api'
 import { compactNumber, signedCompact, score, releaseDate } from '@/lib/format'
 import { RatingBadge } from '@/components/rating-badge'
+import { ReleaseDateChangeBadge } from '@/components/release-date-change-badge'
 import { useWatchlistIds } from '@/lib/watchlist'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -182,6 +183,7 @@ function GameCard({ game, saved }: { game: Game; saved?: boolean }) {
             <span className="text-[#7b8cde]">评分 {score(game.total_score)}</span>
           )}
         </div>
+        <ReleaseDateChangeBadge event={game.latest_release_date_event} compact className="mt-1.5" />
       </div>
     </Link>
   )
@@ -213,6 +215,7 @@ function FeaturedCard({ game, saved }: { game: Game; saved?: boolean }) {
           <span>{releaseDate(game.release_date, game.release_date_is_fuzzy)}</span>
           <span>{compactNumber(game.followers)} 关注</span>
         </div>
+        <ReleaseDateChangeBadge event={game.latest_release_date_event} compact className="mt-1.5" />
         {daysLeft !== null && daysLeft !== undefined && daysLeft >= 0 && (
           <div className="mt-1 text-[10px] text-[#7b8cde]">
             {daysLeft === 0 ? '今日发售' : `${daysLeft} 天后发售`}

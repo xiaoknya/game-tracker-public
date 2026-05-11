@@ -7,6 +7,7 @@ import { FollowersTrend } from "@/components/charts/followers-trend";
 import { ReviewTrend } from "@/components/charts/review-trend";
 import { ScoreRadar } from "@/components/charts/score-radar";
 import { RatingBadge } from "@/components/rating-badge";
+import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
 import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
 import { WatchlistButton } from "@/components/watchlist-button";
@@ -47,13 +48,14 @@ export default async function GameDetailPage({
   const gameId = Number(id);
   if (!Number.isFinite(gameId)) notFound();
 
-  const [game, snapshots, scores, reviewMonthly, reviewSummary, similar] = await Promise.all([
+  const [game, snapshots, scores, reviewMonthly, reviewSummary, similar, releaseDateEvents] = await Promise.all([
     gameApi.getGame(gameId),
     gameApi.getTrend(gameId, 45),
     gameApi.getScores(gameId),
     gameApi.getReviewMonthly(gameId, 12),
     gameApi.getReviewSummary(gameId),
     gameApi.getSimilar(gameId),
+    gameApi.getReleaseDateEvents(gameId, 10),
   ]);
 
   if (!game) notFound();
@@ -105,6 +107,7 @@ export default async function GameDetailPage({
               <span className="rounded bg-[#0f1117] px-2 py-1 text-xs text-[#a0a8c0]">
                 {releaseDate(game.release_date, game.release_date_is_fuzzy)}
               </span>
+              <ReleaseDateChangeBadge event={game.latest_release_date_event} />
             </div>
 
             <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[#e0e4f0] sm:text-4xl">
@@ -393,6 +396,28 @@ export default async function GameDetailPage({
               </div>
             </section>
           ) : null}
+
+          {/* Release date history */}
+          {releaseDateEvents.length > 0 && (
+            <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-4">
+              <SectionHeader eyebrow="Schedule" title="发售日变更" compact />
+              <div className="mt-3 space-y-2">
+                {releaseDateEvents.slice(0, 5).map((event) => (
+                  <div key={event.id} className="rounded-lg bg-[#0f1220] px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <ReleaseDateChangeBadge event={event} compact />
+                      <span className="text-[11px] text-[#4a5070]">{event.detected_at.slice(0, 10)}</span>
+                    </div>
+                    <div className="mt-1 text-xs text-[#7a8099]">
+                      {releaseDate(event.old_release_date, event.old_release_date_is_fuzzy)}
+                      <span className="mx-1 text-[#4a5070]">-&gt;</span>
+                      {releaseDate(event.new_release_date, event.new_release_date_is_fuzzy)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Monthly review quick table */}
           {reviewMonthly.length > 0 && (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 import { WatchlistButton } from "@/components/watchlist-button";
+import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
 import type { Game, Rating } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { compactNumber, releaseDate, score, signedCompact, tagsFromGame } from "@/lib/format";
@@ -96,6 +97,7 @@ export function DashboardCard({ game }: { game: Game }) {
         {game.days_to_release != null && game.days_to_release > 0 && (
           <span className="shrink-0 text-[#7b8cde]">（{game.days_to_release}天）</span>
         )}
+        <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
       </div>
 
       {/* ── Stats 3-col ── */}

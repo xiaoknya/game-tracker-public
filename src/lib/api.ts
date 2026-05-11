@@ -7,6 +7,10 @@ export interface Game {
   name_en: string | null;
   release_date: string | null;
   release_date_is_fuzzy: boolean | null;
+  release_date_raw: string | null;
+  release_date_source: string | null;
+  release_date_last_changed_at: string | null;
+  release_date_change_count: number;
   genre: string | null;
   developer: string | null;
   publisher: string | null;
@@ -25,6 +29,23 @@ export interface Game {
   followers: number | null;
   followers_7d_delta: number | null;
   days_to_release: number | null;
+  latest_release_date_event: ReleaseDateEvent | null;
+}
+
+export interface ReleaseDateEvent {
+  id: number;
+  game_id: number;
+  steam_appid: number;
+  old_release_date: string | null;
+  old_release_date_is_fuzzy: boolean;
+  old_release_date_raw: string | null;
+  new_release_date: string | null;
+  new_release_date_is_fuzzy: boolean;
+  new_release_date_raw: string | null;
+  change_type: string;
+  delta_days: number | null;
+  source: string;
+  detected_at: string;
 }
 
 export interface ReleasedGame extends Game {
@@ -162,6 +183,8 @@ export const gameApi = {
     }),
   getSimilar: (id: number) =>
     apiGet<SimilarGame[]>(`/games/${id}/similar`, { limit: 6 }, { fallback: [] }),
+  getReleaseDateEvents: (id: number, limit = 20) =>
+    apiGet<ReleaseDateEvent[]>(`/games/${id}/release-date-events`, { limit }, { fallback: [] }),
 };
 
 export function steamCover(appid: number | null | undefined) {
