@@ -142,7 +142,7 @@ export const gameApi = {
     apiGet<Game[]>("/games/fuzzy", { months }, { fallback: [] }),
   listReleased: (days = 90) =>
     apiGet<ReleasedGame[]>("/games/released", { days }, { fallback: [] }),
-  search: (q: string, limit = 50) =>
+  search: (q: string, limit = 30) =>
     apiGet<Game[]>("/games/search", { q, limit }, { fallback: [], revalidate: 60 }),
   getGame: (id: number) =>
     apiGet<Game | null>(`/games/${id}`, undefined, { fallback: null }),
