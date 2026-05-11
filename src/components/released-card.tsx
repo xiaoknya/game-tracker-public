@@ -4,23 +4,29 @@ import type { ReleasedGame, Rating, ReviewSentiment, ReviewTopic } from "@/lib/a
 import { steamCover } from "@/lib/api";
 import { tagsFromGame } from "@/lib/format";
 
-const CORNER_BG: Record<string, string> = {
-  S: '#e11d48',
-  A: '#d97706',
-  B: '#0284c7',
-  C: '#52525b',
+const CORNER_GRADIENT: Record<string, [string, string]> = {
+  S: ['rgba(225,29,72,0.92)', 'rgba(225,29,72,0)'],
+  A: ['rgba(217,119,6,0.92)', 'rgba(217,119,6,0)'],
+  B: ['rgba(2,132,199,0.92)', 'rgba(2,132,199,0)'],
+  C: ['rgba(82,82,91,0.85)',  'rgba(82,82,91,0)'],
 }
 
 function CornerRating({ rating }: { rating: Rating }) {
-  const bg = CORNER_BG[String(rating ?? '')] ?? '#3f3f46'
-  const size = 52
+  const [c1, c2] = CORNER_GRADIENT[String(rating ?? '')] ?? ['rgba(63,63,70,0.85)', 'rgba(63,63,70,0)']
+  const size = 44
   return (
     <div className="absolute left-0 top-0 overflow-hidden rounded-tl-xl" style={{ width: size, height: size }}>
       <div
-        className="absolute left-0 top-0 h-0 w-0"
-        style={{ borderTop: `${size}px solid ${bg}`, borderRight: `${size}px solid transparent` }}
+        className="absolute inset-0"
+        style={{
+          clipPath: 'polygon(0 0, 100% 0, 0 100%)',
+          background: `linear-gradient(135deg, ${c1} 30%, ${c2} 100%)`,
+        }}
       />
-      <span className="absolute left-1.5 top-1 text-[13px] font-black text-white drop-shadow">
+      <span
+        className="absolute left-1.5 top-0.5 text-[11px] font-black text-white"
+        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}
+      >
         {String(rating ?? '—')}
       </span>
     </div>
