@@ -12,6 +12,14 @@ type Rating = (typeof RATINGS)[number]
 const DAY_OPTIONS = [30, 60, 90, 180]
 const INITIAL = 12
 const STEP = 12
+const SORT_OPTIONS = [
+  { key: 'date', label: '发售时间' },
+  { key: 'positive', label: '好评率' },
+  { key: 'reviews', label: '评测数' },
+  { key: 'playtime', label: '中位时长' },
+] as const
+type SortKey = (typeof SORT_OPTIONS)[number]['key']
+type OpinionFilter = 'all' | 'high' | 'mixed' | 'low'
 
 const RATING_ACTIVE: Record<Rating, string> = {
   S: 'border-rose-400 bg-rose-400 text-[#0f1117]',
@@ -31,12 +39,15 @@ export function ReleasedSection({
   selectedDays: number
 }) {
   const [selected, setSelected] = useState<Set<Rating>>(new Set())
+  const [sortBy, setSortBy] = useState<SortKey>('date')
+  const [opinion, setOpinion] = useState<OpinionFilter>('all')
   const [visibleCount, setVisibleCount] = useState(INITIAL)
 
   const toggle = (r: Rating) => {
     setSelected((prev) => {
       const next = new Set(prev)
-      next.has(r) ? next.delete(r) : next.add(r)
+      if (next.has(r)) next.delete(r)
+      else next.add(r)
       return next
     })
     setVisibleCount(INITIAL)
@@ -44,20 +55,52 @@ export function ReleasedSection({
 
   const clearFilter = () => {
     setSelected(new Set())
+    setOpinion('all')
     setVisibleCount(INITIAL)
   }
 
-  const filtered = useMemo(
-    () =>
-      selected.size === 0
-        ? allGames
-        : allGames.filter((g) => g.rating && selected.has(g.rating as Rating)),
-    [allGames, selected],
-  )
+  const filtered = useMemo(() => {
+    const games = allGames.filter((g) => {
+      if (selected.size > 0 && (!g.rating || !selected.has(g.rating as Rating))) return false
+      const positiveRate =
+        g.steam_review_total && g.steam_review_positive
+          ? Math.round((g.steam_review_positive / g.steam_review_total) * 100)
+          : null
+      if (opinion === 'high' && (positiveRate === null || positiveRate < 80)) return false
+      if (opinion === 'mixed' && (positiveRate === null || positiveRate < 60 || positiveRate >= 80)) return false
+      if (opinion === 'low' && (positiveRate === null || positiveRate >= 60)) return false
+      return true
+    })
+
+    return games.sort((a, b) => {
+      if (sortBy === 'positive') {
+        const aRate = a.steam_review_total && a.steam_review_positive ? a.steam_review_positive / a.steam_review_total : -1
+        const bRate = b.steam_review_total && b.steam_review_positive ? b.steam_review_positive / b.steam_review_total : -1
+        return bRate - aRate
+      }
+      if (sortBy === 'reviews') return (b.steam_review_total ?? -1) - (a.steam_review_total ?? -1)
+      if (sortBy === 'playtime') return (b.steam_median_playtime ?? -1) - (a.steam_median_playtime ?? -1)
+      return (b.release_date ?? '').localeCompare(a.release_date ?? '')
+    })
+  }, [allGames, opinion, selected, sortBy])
 
   const visible = filtered.slice(0, visibleCount)
   const remaining = filtered.length - visibleCount
   const nextBatch = Math.min(STEP, remaining)
+  const hasFilters = selected.size > 0 || opinion !== 'all'
+  const opinionStats = useMemo(() => {
+    let high = 0
+    let mixed = 0
+    let low = 0
+    allGames.forEach((game) => {
+      if (!game.steam_review_total || !game.steam_review_positive) return
+      const rate = game.steam_review_positive / game.steam_review_total
+      if (rate >= 0.8) high += 1
+      else if (rate >= 0.6) mixed += 1
+      else low += 1
+    })
+    return { high, mixed, low }
+  }, [allGames])
 
   return (
     <section className="mt-5">
@@ -68,12 +111,28 @@ export function ReleasedSection({
           <span className="rounded-full bg-[#0f1117] px-2 py-0.5 text-xs text-[#7b8cde]">
             {filtered.length}
           </span>
-          {selected.size > 0 && (
+          {hasFilters && (
             <span className="text-xs text-[#5a6080]">/ 共 {allGames.length}</span>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={sortBy}
+            onChange={(event) => {
+              setSortBy(event.target.value as SortKey)
+              setVisibleCount(INITIAL)
+            }}
+            className="h-7 rounded-full border border-[#2a2d3e] bg-[#0f1117] px-3 text-xs text-[#c9d0e8] outline-none transition hover:border-[#7b8cde]/60"
+            aria-label="排序方式"
+          >
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.key} value={option.key}>
+                按{option.label}
+              </option>
+            ))}
+          </select>
+
           {RATINGS.map((r) => (
             <button
               key={r}
@@ -87,7 +146,27 @@ export function ReleasedSection({
             </button>
           ))}
 
-          {selected.size > 0 && (
+          {[
+            ['high', `高口碑 ${opinionStats.high}`],
+            ['mixed', `中间档 ${opinionStats.mixed}`],
+            ['low', `低口碑 ${opinionStats.low}`],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                setOpinion(opinion === key ? 'all' : (key as OpinionFilter))
+                setVisibleCount(INITIAL)
+              }}
+              className={`rounded-full border px-3 py-1 text-xs transition ${
+                opinion === key ? 'border-[#7b8cde] bg-[#7b8cde]/20 text-[#c9d0ff]' : CHIP_INACTIVE
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+
+          {hasFilters && (
             <button
               type="button"
               onClick={clearFilter}
@@ -137,7 +216,7 @@ export function ReleasedSection({
           </>
         ) : (
           <div className="grid min-h-40 place-items-center rounded-lg border border-dashed border-[#2a2d3e] text-sm text-[#7a8099]">
-            暂无{selected.size > 0 ? ` ${[...selected].join('/')} 级` : ''}已发售游戏
+            暂无符合当前筛选的已发售游戏
           </div>
         )}
       </div>

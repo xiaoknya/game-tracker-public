@@ -6,14 +6,16 @@ import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 
 import { RatingBadge } from "@/components/rating-badge";
+import { WatchlistButton } from "@/components/watchlist-button";
 import type { Game } from "@/lib/api";
-import { compactNumber } from "@/lib/format";
+import { compactNumber, releaseDate } from "@/lib/format";
 
 export function SearchBar() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Game[]>([]);
+  const [hotGames, setHotGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,52 +36,86 @@ export function SearchBar() {
 
   // Auto-focus on open; reset on close
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 40);
-    } else {
-      setQuery("");
-      setResults([]);
-      setCursor(0);
-    }
+    if (!open) return;
+    const focusTimer = setTimeout(() => inputRef.current?.focus(), 40);
+    return () => clearTimeout(focusTimer);
   }, [open]);
+
+  useEffect(() => {
+    if (!open || hotGames.length > 0) return;
+    let ignore = false;
+    fetch("/api/search?hot=1&limit=8")
+      .then((res) => res.json())
+      .then((data: Game[]) => {
+        if (!ignore) setHotGames(data);
+      })
+      .catch(() => {
+        if (!ignore) setHotGames([]);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [hotGames.length, open]);
 
   // Debounced search
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!query.trim()) {
-      setResults([]);
-      setLoading(false);
       return;
     }
-    setLoading(true);
+    let ignore = false;
     timerRef.current = setTimeout(async () => {
       try {
+        setLoading(true);
         const res = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`);
         const data: Game[] = await res.json();
-        setResults(data);
-        setCursor(0);
+        if (!ignore) {
+          setResults(data);
+          setCursor(0);
+        }
       } catch {
-        setResults([]);
+        if (!ignore) setResults([]);
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     }, 250);
+    return () => {
+      ignore = true;
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [query]);
 
-  const close = () => setOpen(false);
+  const close = () => {
+    setOpen(false);
+    setQuery("");
+    setResults([]);
+    setCursor(0);
+    setLoading(false);
+  };
+
+  const updateQuery = (value: string) => {
+    setQuery(value);
+    setCursor(0);
+    if (!value.trim()) {
+      setResults([]);
+      setLoading(false);
+    }
+  };
+
+  const activeList = query.trim() ? results : hotGames;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") { close(); return; }
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setCursor((c) => (c + 1) % Math.max(results.length, 1));
+      setCursor((c) => (c + 1) % Math.max(activeList.length, 1));
     }
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      setCursor((c) => (c - 1 + Math.max(results.length, 1)) % Math.max(results.length, 1));
+      setCursor((c) => (c - 1 + Math.max(activeList.length, 1)) % Math.max(activeList.length, 1));
     }
-    if (e.key === "Enter" && results[cursor]) {
-      router.push(`/games/${results[cursor].id}`);
+    if (e.key === "Enter" && activeList[cursor]) {
+      router.push(`/games/${activeList[cursor].id}`);
       close();
     }
   };
@@ -118,7 +154,7 @@ export function SearchBar() {
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => updateQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="搜索游戏名、开发商…"
                   autoComplete="off"
@@ -127,7 +163,7 @@ export function SearchBar() {
                 {query ? (
                   <button
                     type="button"
-                    onClick={() => setQuery("")}
+                    onClick={() => updateQuery("")}
                     className="text-[#5a6080] transition hover:text-white"
                   >
                     <X className="size-4" />
@@ -143,9 +179,13 @@ export function SearchBar() {
 
               {/* Body */}
               {!query.trim() ? (
-                <div className="px-4 py-8 text-center text-sm text-[#5a6080]">
-                  输入游戏名开始搜索
-                </div>
+                <SearchList
+                  games={hotGames}
+                  cursor={cursor}
+                  close={close}
+                  heading="近期 S/A 级"
+                  empty="输入游戏名开始搜索"
+                />
               ) : loading ? (
                 <div className="px-4 py-8 text-center text-sm text-[#5a6080]">搜索中…</div>
               ) : results.length === 0 ? (
@@ -154,59 +194,7 @@ export function SearchBar() {
                 </div>
               ) : (
                 <>
-                  <ul className="max-h-80 overflow-y-auto">
-                    {results.map((g, i) => (
-                      <li key={g.id}>
-                        <Link
-                          href={`/games/${g.id}`}
-                          onClick={close}
-                          className={`flex items-center gap-3 px-4 py-2.5 transition ${
-                            i === cursor ? "bg-[#1c2245]" : "hover:bg-[#191c33]"
-                          }`}
-                        >
-                          {/* Cover */}
-                          {g.cover_image ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={g.cover_image}
-                              alt=""
-                              loading="lazy"
-                              className="h-9 w-16 shrink-0 rounded object-cover"
-                            />
-                          ) : (
-                            <div className="grid h-9 w-16 shrink-0 place-items-center rounded bg-[#0b0e16] text-xs text-[#5a6080]">
-                              {g.name[0]}
-                            </div>
-                          )}
-
-                          {/* Info */}
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-[13px] font-medium text-[#e0e4f0]">
-                              {g.name}
-                            </div>
-                            <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[#5a6080]">
-                              {g.developer && (
-                                <span className="truncate max-w-[160px]">{g.developer}</span>
-                              )}
-                              {g.release_date && (
-                                <span className="shrink-0">{g.release_date.slice(0, 4)}</span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Rating + followers */}
-                          <div className="flex shrink-0 flex-col items-end gap-1">
-                            <RatingBadge rating={g.rating} className="text-[10px] px-1.5 py-0" />
-                            {g.followers != null && (
-                              <span className="text-[11px] text-[#5a6080]">
-                                {compactNumber(g.followers)}
-                              </span>
-                            )}
-                          </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+                  <SearchList games={results} cursor={cursor} close={close} heading="搜索结果" />
 
                   {/* Footer hint */}
                   <div className="flex items-center gap-4 border-t border-[#1e2235] px-4 py-2 text-[11px] text-[#4a5070]">
@@ -221,5 +209,66 @@ export function SearchBar() {
         </>
       )}
     </>
+  );
+}
+
+function SearchList({
+  games,
+  cursor,
+  close,
+  heading,
+  empty,
+}: {
+  games: Game[];
+  cursor: number;
+  close: () => void;
+  heading: string;
+  empty?: string;
+}) {
+  if (games.length === 0) {
+    return <div className="px-4 py-8 text-center text-sm text-[#5a6080]">{empty ?? "暂无推荐"}</div>;
+  }
+
+  return (
+    <div>
+      <div className="px-4 py-2 text-[11px] uppercase tracking-widest text-[#5a6080]">{heading}</div>
+      <ul className="max-h-80 overflow-y-auto">
+        {games.map((g, i) => (
+          <li key={g.id} className={i === cursor ? "bg-[#1c2245]" : "hover:bg-[#191c33]"}>
+            <div className="flex items-center gap-3 px-4 py-2.5 transition">
+              <Link href={`/games/${g.id}`} onClick={close} className="contents">
+                {g.cover_image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={g.cover_image}
+                    alt=""
+                    loading="lazy"
+                    className="h-10 w-[72px] shrink-0 rounded object-cover"
+                  />
+                ) : (
+                  <div className="grid h-10 w-[72px] shrink-0 place-items-center rounded bg-[#0b0e16] text-xs text-[#5a6080]">
+                    {g.name[0]}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[13px] font-medium text-[#e0e4f0]">{g.name}</div>
+                  <div className="mt-0.5 flex min-w-0 items-center gap-2 text-[11px] text-[#5a6080]">
+                    {g.developer && <span className="truncate max-w-[140px]">{g.developer}</span>}
+                    <span className="shrink-0">{releaseDate(g.release_date, g.release_date_is_fuzzy)}</span>
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <RatingBadge rating={g.rating} className="text-[10px] px-1.5 py-0" />
+                  {g.followers != null && (
+                    <span className="text-[11px] text-[#5a6080]">{compactNumber(g.followers)}</span>
+                  )}
+                </div>
+              </Link>
+              <WatchlistButton gameId={g.id} compact />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

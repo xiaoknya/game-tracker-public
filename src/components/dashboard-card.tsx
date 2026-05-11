@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
+import { WatchlistButton } from "@/components/watchlist-button";
 import type { Game, Rating } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { compactNumber, releaseDate, score, signedCompact, tagsFromGame } from "@/lib/format";
@@ -49,8 +50,7 @@ export function DashboardCard({ game }: { game: Game }) {
   const isFree = Boolean(game.is_free);
 
   return (
-    <Link
-      href={`/games/${game.id}`}
+    <article
       className={`group block cursor-pointer rounded-xl border border-[#2a2d3e] bg-[#1a1d2e] p-3 shadow-[0_6px_20px_rgba(2,6,23,0.3)] transition-all duration-200 hover:-translate-y-[3px] ${glowClass}`}
     >
       {/* ── Cover: aspect-ratio scales with card width ── */}
@@ -66,15 +66,27 @@ export function DashboardCard({ game }: { game: Game }) {
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-[#3a3d55]">No image</div>
         )}
+        <Link
+          href={`/games/${game.id}`}
+          aria-label={`查看 ${game.name}`}
+          className="absolute inset-0 z-10"
+        />
         <CornerRating rating={game.rating} />
+        <WatchlistButton
+          gameId={game.id}
+          compact
+          className="absolute right-2 top-2 z-20 bg-[#0b0e16]/75 backdrop-blur"
+        />
         {/* Bottom fade */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#1a1d2e] to-transparent" />
       </div>
 
       {/* ── Name ── */}
-      <h3 className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#e0e4f0]">
-        {game.name}
-      </h3>
+      <Link href={`/games/${game.id}`} className="block">
+        <h3 className="line-clamp-2 text-[13px] font-semibold leading-[1.4] text-[#e0e4f0] transition group-hover:text-white">
+          {game.name}
+        </h3>
+      </Link>
 
       {/* ── Meta ── */}
       <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-[#7a8099]">
@@ -116,7 +128,7 @@ export function DashboardCard({ game }: { game: Game }) {
           ))}
         </div>
       )}
-    </Link>
+    </article>
   );
 }
 

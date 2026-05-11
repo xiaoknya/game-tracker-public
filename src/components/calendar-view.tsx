@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { type Game, steamCover } from '@/lib/api'
 import { compactNumber, signedCompact, score, releaseDate } from '@/lib/format'
 import { RatingBadge } from '@/components/rating-badge'
+import { useWatchlistIds } from '@/lib/watchlist'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -18,6 +19,7 @@ interface CalendarCell {
   day: number
   inMonth: boolean
   count: number
+  savedCount: number
   rating: RatingTone
   signals: Array<'S' | 'A' | 'B'>
   isSelected: boolean
@@ -130,13 +132,16 @@ function DayCell({ cell, onClick }: { cell: CalendarCell; onClick: () => void })
           {cell.count > 0 && (
             <span className="text-[9px] text-[#5a6080]">{cell.count}款</span>
           )}
+          {cell.savedCount > 0 && (
+            <span className="text-[9px] text-[#9aa8ff]">已藏 {cell.savedCount}</span>
+          )}
         </div>
       )}
     </button>
   )
 }
 
-function GameCard({ game }: { game: Game }) {
+function GameCard({ game, saved }: { game: Game; saved?: boolean }) {
   const tags = (game.tags || game.genre || '').split(',').map(t => t.trim()).filter(Boolean).slice(0, 3)
   const cover = game.cover_image || steamCover(game.steam_appid)
 
@@ -154,6 +159,7 @@ function GameCard({ game }: { game: Game }) {
         <div className="flex items-center gap-2">
           <RatingBadge rating={game.rating} className="h-5 min-w-7 text-xs" />
           <span className="truncate text-sm font-semibold text-[#e0e4f0]">{game.name}</span>
+          {saved && <span className="rounded bg-[#7b8cde]/20 px-1.5 py-0.5 text-[10px] text-[#b7c2ff]">已收藏</span>}
         </div>
         {game.short_description && (
           <p className="mt-1 line-clamp-2 text-xs text-[#7a8099]">{game.short_description}</p>
@@ -181,7 +187,7 @@ function GameCard({ game }: { game: Game }) {
   )
 }
 
-function FeaturedCard({ game }: { game: Game }) {
+function FeaturedCard({ game, saved }: { game: Game; saved?: boolean }) {
   const cover = game.cover_image || steamCover(game.steam_appid)
   const daysLeft = game.days_to_release
 
@@ -201,6 +207,7 @@ function FeaturedCard({ game }: { game: Game }) {
         <div className="flex items-start gap-2">
           <RatingBadge rating={game.rating} className="h-5 min-w-7 shrink-0 text-xs" />
           <span className="line-clamp-1 text-xs font-semibold text-[#e0e4f0]">{game.name}</span>
+          {saved && <span className="ml-auto shrink-0 rounded bg-[#7b8cde]/20 px-1.5 py-0.5 text-[10px] text-[#b7c2ff]">已藏</span>}
         </div>
         <div className="mt-1.5 flex items-center justify-between text-[10px] text-[#5a6080]">
           <span>{releaseDate(game.release_date, game.release_date_is_fuzzy)}</span>
@@ -249,21 +256,16 @@ export function CalendarView({
 
   const [selectedMonthKey, setSelectedMonthKey] = useState(currentMonthKey)
   const [selectedDateStr, setSelectedDateStr] = useState<string | null>(null)
+  const savedIds = useWatchlistIds()
+  const savedSet = useMemo(() => new Set(savedIds), [savedIds])
 
   // Derived data
   const {
-    calendarGames,
     exactGamesByDate,
     exactGamesByMonth,
     fuzzyGamesByMonth,
     availableMonthKeys,
   } = useMemo(() => {
-    // Only S/A/B rated non-fuzzy games for the calendar display
-    const calendarGames = upcomingGames.filter(g => {
-      const r = normalizeRating(g.rating)
-      return (r === 's' || r === 'a' || r === 'b') && !g.release_date_is_fuzzy
-    })
-
     // Map all non-fuzzy upcoming games by date and month
     const exactGamesByDate = new Map<string, Game[]>()
     const exactGamesByMonth = new Map<string, Game[]>()
@@ -306,12 +308,18 @@ export function CalendarView({
       cursor = shiftMonth(cursor, 1)
     }
 
-    return { calendarGames, exactGamesByDate, exactGamesByMonth, fuzzyGamesByMonth, availableMonthKeys }
-  }, [upcomingGames, fuzzyGames])
+    return { exactGamesByDate, exactGamesByMonth, fuzzyGamesByMonth, availableMonthKeys }
+  }, [upcomingGames, fuzzyGames, currentMonthKey])
 
   // Derived per-month data
-  const selectedMonthGames = exactGamesByMonth.get(selectedMonthKey) ?? []
-  const selectedMonthFuzzyGames = fuzzyGamesByMonth.get(selectedMonthKey) ?? []
+  const selectedMonthGames = useMemo(
+    () => exactGamesByMonth.get(selectedMonthKey) ?? [],
+    [exactGamesByMonth, selectedMonthKey],
+  )
+  const selectedMonthFuzzyGames = useMemo(
+    () => fuzzyGamesByMonth.get(selectedMonthKey) ?? [],
+    [fuzzyGamesByMonth, selectedMonthKey],
+  )
 
   // Effective selected date
   const effectiveSelectedDate = useMemo(() => {
@@ -398,10 +406,11 @@ export function CalendarView({
         signals,
         isSelected: dateStr === effectiveSelectedDate,
         isToday: dateStr === todayStr,
+        savedCount: gamesOnDay.filter((game) => savedSet.has(game.id)).length,
       })
     }
     return cells
-  }, [selectedMonthKey, effectiveSelectedDate, exactGamesByDate, todayStr])
+  }, [selectedMonthKey, effectiveSelectedDate, exactGamesByDate, savedSet, todayStr])
 
   // Stats
   const releaseDaysCount = useMemo(() => {
@@ -421,6 +430,11 @@ export function CalendarView({
       return r === 's' || r === 'a'
     }).length
   }, [selectedMonthGames])
+
+  const savedInMonth = useMemo(
+    () => selectedMonthGames.filter((game) => savedSet.has(game.id)).length,
+    [savedSet, selectedMonthGames],
+  )
 
   const topGameName = useMemo(() => {
     const top = [...selectedMonthGames].sort(compareFeatured)[0]
@@ -486,6 +500,7 @@ export function CalendarView({
             <StatCard label="本月发售" value={selectedMonthGames.length} sub={`${releaseDaysCount} 个发售日`} />
             <StatCard label="A级以上" value={highRatedCount} sub={topGameName} />
             <StatCard label="当天上新" value={selectedDayGames.length} sub={selectedDateLabel} />
+            <StatCard label="已收藏" value={savedInMonth} sub="当前浏览器" />
           </div>
         </div>
       </div>
@@ -533,7 +548,8 @@ export function CalendarView({
             <span className="rounded-full border border-rose-400/30 bg-rose-400/10 px-2 py-0.5 text-rose-300">S 级</span>
             <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-amber-300">A 级</span>
             <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-sky-300">B 级</span>
-            <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-0.5 text-teal-300">今日</span>
+                <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-0.5 text-teal-300">今日</span>
+            <span className="rounded-full border border-[#7b8cde]/30 bg-[#7b8cde]/10 px-2 py-0.5 text-[#b7c2ff]">已收藏</span>
           </div>
 
           {/* Weekday header */}
@@ -566,7 +582,7 @@ export function CalendarView({
             </div>
             {selectedDayGames.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2">
-                {selectedDayGames.map(g => <GameCard key={g.id} game={g} />)}
+                {selectedDayGames.map(g => <GameCard key={g.id} game={g} saved={savedSet.has(g.id)} />)}
               </div>
             ) : (
               <div className="py-8 text-center text-sm text-[#5a6080]">这一天暂无精确发售</div>
@@ -586,7 +602,7 @@ export function CalendarView({
             </div>
             {featuredGames.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {featuredGames.map(g => <FeaturedCard key={g.id} game={g} />)}
+                {featuredGames.map(g => <FeaturedCard key={g.id} game={g} saved={savedSet.has(g.id)} />)}
               </div>
             ) : (
               <div className="py-6 text-center text-sm text-[#5a6080]">本月暂无精确发售游戏</div>

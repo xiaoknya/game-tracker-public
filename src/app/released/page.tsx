@@ -4,6 +4,11 @@ import { gameApi } from "@/lib/api";
 
 const RATING_ORDER: Record<string, number> = { S: 0, A: 1, B: 2, C: 3 };
 
+export const metadata = {
+  title: "已发售游戏",
+  description: "浏览近期已发售游戏的 Steam 口碑、评测数量和玩家反馈主题。",
+};
+
 export default async function ReleasedPage({
   searchParams,
 }: {

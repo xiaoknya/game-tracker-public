@@ -13,7 +13,6 @@ export function SentimentRing({
   }
 
   const pct = Math.round((positive / total) * 100);
-  const negPct = 100 - pct;
 
   // SVG donut math
   const size = 100;
@@ -24,7 +23,6 @@ export function SentimentRing({
   const circumference = 2 * Math.PI * r;
 
   const posArc = (pct / 100) * circumference;
-  const negArc = (negPct / 100) * circumference;
 
   // Color based on rate
   const posColor = pct >= 80 ? "#34d399" : pct >= 60 ? "#7b8cde" : pct >= 40 ? "#fbbf24" : "#f87171";

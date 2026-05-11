@@ -12,8 +12,23 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "Game Tracker Public",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://game.xiaoknya.cn"),
+  title: {
+    default: "游戏热度追踪",
+    template: "%s | 游戏热度追踪",
+  },
   description: "公开版游戏热度榜、发售日历和 Steam 社区趋势。",
+  openGraph: {
+    title: "游戏热度追踪",
+    description: "公开版游戏热度榜、发售日历和 Steam 社区趋势。",
+    url: "/",
+    siteName: "游戏热度追踪",
+    locale: "zh_CN",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({

@@ -4,7 +4,10 @@ import { SectionPanel } from "@/components/section-panel";
 import { DashboardCard } from "@/components/dashboard-card";
 import { gameApi } from "@/lib/api";
 
-const dayOptions = [7, 15, 30, 60];
+export const metadata = {
+  title: "主看板",
+  description: "按评级、热度、发售时间和标签浏览即将发售的 Steam 游戏。",
+};
 
 export default async function Home({
   searchParams,

@@ -9,8 +9,9 @@ import { ScoreRadar } from "@/components/charts/score-radar";
 import { RatingBadge } from "@/components/rating-badge";
 import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
+import { WatchlistButton } from "@/components/watchlist-button";
 import { buttonVariants } from "@/components/ui/button";
-import { gameApi, steamCover, type ReleasedGame } from "@/lib/api";
+import { gameApi, steamCover, type Game, type ReleasedGame, type ReviewSentiment, type ReviewTopic } from "@/lib/api";
 import {
   compactNumber,
   integer,
@@ -26,7 +27,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const game = await gameApi.getGame(Number(id));
   return {
-    title: game ? `${game.name} — Game Tracker` : "Game Tracker",
+    title: game ? `${game.name} | 游戏热度追踪` : "游戏热度追踪",
+    description: game?.short_description ?? "Steam 游戏热度、评分和社区趋势详情。",
+    openGraph: {
+      title: game ? `${game.name} | 游戏热度追踪` : "游戏热度追踪",
+      description: game?.short_description ?? "Steam 游戏热度、评分和社区趋势详情。",
+      images: game?.cover_image ? [game.cover_image] : [],
+    },
   };
 }
 
@@ -66,6 +73,7 @@ export default async function GameDetailPage({
     reviewTotal && reviewPositive
       ? Math.round((reviewPositive / reviewTotal) * 100)
       : null;
+  const decisionNotes = buildDecisionNotes(game, positiveRate);
 
   // Language distribution: from latest monthly stat
   const latestLangDist =
@@ -143,6 +151,7 @@ export default async function GameDetailPage({
 
             {/* Action buttons */}
             <div className="mt-5 flex flex-wrap gap-2">
+              <WatchlistButton gameId={game.id} />
               {game.steam_url && (
                 <a
                   href={game.steam_url}
@@ -200,6 +209,28 @@ export default async function GameDetailPage({
           </div>
         </div>
       </section>
+
+      {decisionNotes.length > 0 && (
+        <section className="mt-5 rounded-xl border border-[#2a2d3e] bg-[#12152b] p-4">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-xs uppercase tracking-widest text-[#7b8cde]">Decision Brief</div>
+              <h2 className="mt-1 text-lg font-semibold text-[#e0e4f0]">为什么值得关注</h2>
+            </div>
+            <span className="rounded-full bg-[#0f1117] px-3 py-1 text-xs text-[#7a8099]">
+              面向公开版读者
+            </span>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            {decisionNotes.map((note) => (
+              <article key={note.title} className="rounded-lg border border-[#1e2235] bg-[#0f1220] p-3">
+                <div className={`text-sm font-semibold ${note.tone}`}>{note.title}</div>
+                <p className="mt-1.5 text-sm leading-6 text-[#8f98b8]">{note.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Metric strip ──────────────────────────────────────────────────── */}
       <div className="mt-5 grid gap-3 rounded-xl border border-[#2a2d3e] bg-[#12152b] p-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -586,22 +617,7 @@ function SidebarStat({
   );
 }
 
-function SentimentDot({ sentiment }: { sentiment: string }) {
-  const colors: Record<string, string> = {
-    strongly_positive: "bg-emerald-400",
-    positive: "bg-teal-400",
-    mixed: "bg-amber-400",
-    negative: "bg-orange-400",
-    strongly_negative: "bg-rose-400",
-  };
-  return (
-    <span className={`inline-block h-2 w-2 rounded-full ${colors[sentiment] ?? "bg-[#4a5070]"}`} />
-  );
-}
-
 // ─── Review topics three-column grid ─────────────────────────────────────────
-
-import type { ReviewTopic, ReviewSentiment } from "@/lib/api";
 
 const POS_SENTIMENTS = new Set<ReviewSentiment>(["strongly_positive", "positive"]);
 const NEG_SENTIMENTS = new Set<ReviewSentiment>(["negative", "strongly_negative"]);
@@ -655,15 +671,25 @@ function ReviewTopicsGrid({ topics }: { topics: ReviewTopic[] }) {
   const mix = topics.filter((t) => t.sentiment === "mixed").sort((a, b) => b.pct - a.pct);
   const neg = topics.filter((t) => NEG_SENTIMENTS.has(t.sentiment)).sort((a, b) => b.pct - a.pct);
 
-  const Col = ({
-    dot,
-    label,
-    items,
-  }: {
-    dot: string;
-    label: string;
-    items: ReviewTopic[];
-  }) => (
+  return (
+    <div className="mt-4 grid gap-4 md:grid-cols-3">
+      <ReviewTopicColumn dot="#52c41a" label="好评" items={pos} />
+      <ReviewTopicColumn dot="#ffc53d" label="褒贬不一" items={mix} />
+      <ReviewTopicColumn dot="#ff4d4f" label="差评" items={neg} />
+    </div>
+  );
+}
+
+function ReviewTopicColumn({
+  dot,
+  label,
+  items,
+}: {
+  dot: string;
+  label: string;
+  items: ReviewTopic[];
+}) {
+  return (
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 pb-1">
         <span className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />
@@ -671,7 +697,7 @@ function ReviewTopicsGrid({ topics }: { topics: ReviewTopic[] }) {
         <span className="ml-auto text-[11px] text-[#5a6080]">{items.length} 项</span>
       </div>
       {items.length > 0 ? (
-        items.map((t) => <TopicCard key={t.title} topic={t} />)
+        items.map((topic) => <TopicCard key={topic.title} topic={topic} />)
       ) : (
         <p className="rounded-lg border border-dashed border-[#1e2235] py-4 text-center text-[12px] text-[#4a5070]">
           暂无
@@ -679,12 +705,44 @@ function ReviewTopicsGrid({ topics }: { topics: ReviewTopic[] }) {
       )}
     </div>
   );
+}
 
-  return (
-    <div className="mt-4 grid gap-4 md:grid-cols-3">
-      <Col dot="#52c41a" label="好评" items={pos} />
-      <Col dot="#ffc53d" label="褒贬不一" items={mix} />
-      <Col dot="#ff4d4f" label="差评" items={neg} />
-    </div>
-  );
+function buildDecisionNotes(game: Game, positiveRate: number | null) {
+  const notes: Array<{ title: string; body: string; tone: string }> = [];
+  if (game.rating === "S" || game.rating === "A") {
+    notes.push({
+      title: `${game.rating} 级候选`,
+      body: `综合评分 ${score(game.total_score)}，属于当前公开榜里优先级较高的关注对象。`,
+      tone: game.rating === "S" ? "text-rose-300" : "text-amber-300",
+    });
+  }
+  if ((game.followers_7d_delta ?? 0) > 0) {
+    notes.push({
+      title: "近期热度在涨",
+      body: `过去 7 天 SteamDB 关注增加 ${signedCompact(game.followers_7d_delta)}，适合继续观察发售前声量。`,
+      tone: "text-emerald-300",
+    });
+  }
+  if (positiveRate !== null) {
+    notes.push({
+      title: "发售后口碑信号",
+      body: `当前可见 Steam 好评率约 ${positiveRate}%，可以和评测主题一起判断真实体验。`,
+      tone: positiveRate >= 80 ? "text-emerald-300" : positiveRate >= 60 ? "text-amber-300" : "text-rose-300",
+    });
+  }
+  if (game.modifier_adaptation_required) {
+    notes.push({
+      title: "需要额外判断",
+      body: "该游戏带有 Mod 适配提示，若你关注社区生态或长期内容，建议结合 SteamDB 与评测趋势再判断。",
+      tone: "text-sky-300",
+    });
+  }
+  if (notes.length === 0) {
+    notes.push({
+      title: "基础数据已归档",
+      body: "当前信号偏中性，可以先看关注数、发售窗口和相似游戏，再决定是否加入收藏。",
+      tone: "text-[#b7c2ff]",
+    });
+  }
+  return notes.slice(0, 3);
 }
