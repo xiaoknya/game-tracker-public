@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, CheckCircle2, Gamepad2, LineChart } from "lucide-react";
+import { Calendar, CheckCircle2, Gamepad2, LineChart, Swords } from "lucide-react";
 
 import { SearchBar } from "@/components/search-bar";
 
@@ -9,10 +9,10 @@ const navItems = [
   { href: "/calendar", label: "发售日历", icon: Calendar },
 ];
 
-const titles: Record<string, string> = {
-  "/": "主看板 · 即将发售游戏评级",
-  "/released": "已发售游戏",
-  "/calendar": "发售日历",
+const pageMeta: Record<string, { title: string; sub: string; icon: React.ElementType }> = {
+  "/":         { title: "主看板",     sub: "即将发售游戏评级",  icon: LineChart    },
+  "/released": { title: "已发售游戏", sub: "近期上线游戏汇总",  icon: CheckCircle2 },
+  "/calendar": { title: "发售日历",   sub: "按日期浏览发售计划", icon: Calendar     },
 };
 
 export function AppShell({
@@ -22,9 +22,10 @@ export function AppShell({
   children: React.ReactNode;
   activePath?: string;
 }) {
-  const pageTitle = activePath.startsWith("/games")
-    ? "游戏详情"
-    : titles[activePath] ?? "游戏热度追踪系统";
+  const meta = activePath.startsWith("/games")
+    ? { title: "游戏详情", sub: "Steam 数据 · 评测分析", icon: Swords }
+    : pageMeta[activePath] ?? { title: "游戏热度追踪", sub: "", icon: Gamepad2 };
+  const PageIcon = meta.icon;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0f1117] text-[#e0e4f0]">
@@ -61,14 +62,19 @@ export function AppShell({
 
       <div className="min-w-0 flex-1 flex flex-col overflow-y-auto">
         <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
-          <div className="min-w-0">
-            <div className="truncate text-[15px] font-medium text-[#a0a8c0]">{pageTitle}</div>
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="hidden size-8 shrink-0 place-items-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:grid">
+              <PageIcon className="size-4" />
+            </span>
+            <div className="min-w-0">
+              <div className="truncate text-[14px] font-semibold text-[#e0e4f0] leading-tight">{meta.title}</div>
+              {meta.sub && (
+                <div className="truncate text-[11px] text-[#5a6080] leading-tight">{meta.sub}</div>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <SearchBar />
-            <span className="hidden rounded-sm border border-emerald-400/25 bg-emerald-400/10 px-2 py-1 text-xs text-emerald-300 sm:inline">
-              系统运行中
-            </span>
           </div>
         </header>
 
