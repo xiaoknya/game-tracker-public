@@ -17,7 +17,7 @@ export default async function SearchPage({
   const params = await searchParams;
   const query = (params.q ?? "").trim();
   const [backendResults, upcoming, fuzzy, released] = await Promise.all([
-    query ? gameApi.search(query, 80) : Promise.resolve([]),
+    query ? gameApi.search(query, 50) : Promise.resolve([]),
     gameApi.listUpcoming({ days: 365 }),
     gameApi.listFuzzy(12),
     gameApi.listReleased(180),
