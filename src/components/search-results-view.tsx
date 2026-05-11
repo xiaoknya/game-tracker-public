@@ -4,7 +4,8 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { DashboardCard } from "@/components/dashboard-card";
-import type { Game } from "@/lib/api";
+import { ReleasedCard } from "@/components/released-card";
+import type { Game, ReleasedGame } from "@/lib/api";
 
 const RATINGS = ["S", "A", "B", "C"] as const;
 type Rating = (typeof RATINGS)[number];
@@ -149,7 +150,11 @@ export function SearchResultsView({
           {filtered.length > 0 ? (
             <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
               {filtered.map((game) => (
-                <DashboardCard key={game.id} game={game} />
+                isReleasedResult(game) ? (
+                  <ReleasedCard key={game.id} game={game} />
+                ) : (
+                  <DashboardCard key={game.id} game={game} />
+                )
               ))}
             </div>
           ) : (
@@ -163,5 +168,14 @@ export function SearchResultsView({
         </div>
       </div>
     </section>
+  );
+}
+
+function isReleasedResult(game: Game): game is ReleasedGame {
+  return (
+    "steam_review_total" in game ||
+    "steam_review_positive" in game ||
+    "steam_review_score_desc" in game ||
+    "steam_median_playtime" in game
   );
 }
