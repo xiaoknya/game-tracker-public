@@ -4,6 +4,7 @@ import type { ReleasedGame, Rating, ReviewSentiment, ReviewTopic } from "@/lib/a
 import { steamCover } from "@/lib/api";
 import { tagsFromGame } from "@/lib/format";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
+import { PriceBadge } from "@/components/price-badge";
 
 const CORNER_GRADIENT: Record<string, [string, string]> = {
   S: ['rgba(225,29,72,0.92)', 'rgba(225,29,72,0)'],
@@ -150,7 +151,10 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
       <div>
         {/* Game name */}
         <h3 className="line-clamp-1 text-[14px] font-bold text-[#e0e4f0]">{game.name}</h3>
-        <ReleaseDateChangeBadge event={game.latest_release_date_event} compact className="mt-1.5" />
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={Boolean(game.is_free)} />
+          <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
+        </div>
 
         {/* ── Good-rate bar ── */}
         {positiveRate != null && (

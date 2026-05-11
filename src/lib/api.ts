@@ -30,6 +30,36 @@ export interface Game {
   followers_7d_delta: number | null;
   days_to_release: number | null;
   latest_release_date_event: ReleaseDateEvent | null;
+  primary_price: GamePrice | null;
+}
+
+export interface GamePrice {
+  id: number;
+  game_id: number;
+  steam_appid: number;
+  region_code: string;
+  currency: string | null;
+  initial_price: number | null;
+  final_price: number | null;
+  discount_percent: number | null;
+  is_free: boolean;
+  is_available: boolean;
+  fetched_at: string;
+}
+
+export interface GamePriceSnapshot {
+  id: number;
+  game_id: number;
+  steam_appid: number;
+  region_code: string;
+  currency: string | null;
+  initial_price: number | null;
+  final_price: number | null;
+  discount_percent: number | null;
+  is_free: boolean;
+  is_available: boolean;
+  snapshot_date: string;
+  source: string;
 }
 
 export interface ReleaseDateEvent {
@@ -185,6 +215,14 @@ export const gameApi = {
     apiGet<SimilarGame[]>(`/games/${id}/similar`, { limit: 6 }, { fallback: [] }),
   getReleaseDateEvents: (id: number, limit = 20) =>
     apiGet<ReleaseDateEvent[]>(`/games/${id}/release-date-events`, { limit }, { fallback: [] }),
+  getPrices: (id: number) =>
+    apiGet<GamePrice[]>(`/games/${id}/prices`, undefined, { fallback: [] }),
+  getPriceHistory: (id: number, region = "CN", days = 365) =>
+    apiGet<GamePriceSnapshot[]>(
+      `/games/${id}/price-history`,
+      { region, days },
+      { fallback: [] },
+    ),
 };
 
 export function steamCover(appid: number | null | undefined) {

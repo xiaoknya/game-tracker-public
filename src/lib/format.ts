@@ -1,4 +1,4 @@
-import type { Game, Rating } from "@/lib/api";
+import type { Game, GamePrice, Rating } from "@/lib/api";
 
 export function compactNumber(value: number | null | undefined) {
   if (value === null || value === undefined) return "—";
@@ -22,6 +22,42 @@ export function signedCompact(value: number | null | undefined) {
 export function score(value: number | null | undefined) {
   if (value === null || value === undefined) return "—";
   return value.toFixed(1);
+}
+
+const ZERO_DECIMAL_CURRENCIES = new Set(["CLP", "IDR", "JPY", "KRW", "VND"]);
+
+export function steamPriceAmount(value: number | null | undefined, currency: string | null | undefined) {
+  if (value === null || value === undefined) return null;
+  return ZERO_DECIMAL_CURRENCIES.has(String(currency ?? "").toUpperCase()) ? value : value / 100;
+}
+
+export function currencyAmountLabel(
+  amount: number | null | undefined,
+  currency: string | null | undefined,
+  fallback = "待定",
+) {
+  if (amount === null || amount === undefined) return fallback;
+  const normalizedCurrency = currency || "CNY";
+
+  try {
+    return Intl.NumberFormat("zh-CN", {
+      style: "currency",
+      currency: normalizedCurrency,
+      maximumFractionDigits: ZERO_DECIMAL_CURRENCIES.has(normalizedCurrency.toUpperCase()) ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return `${normalizedCurrency} ${amount.toFixed(2)}`;
+  }
+}
+
+export function steamPriceLabel(price: GamePrice | null | undefined, fallback = "待定") {
+  if (!price) return fallback;
+  if (price.is_free) return "免费";
+  if (!price.is_available || price.final_price === null || price.final_price === undefined) return fallback;
+
+  const currency = price.currency || "CNY";
+  const amount = steamPriceAmount(price.final_price, currency);
+  return currencyAmountLabel(amount, currency, fallback);
 }
 
 export function releaseDate(value: string | null | undefined, fuzzy?: boolean | null) {
@@ -57,4 +93,3 @@ export function tagsFromGame(game: Pick<Game, "tags" | "genre">, limit = 3) {
     .filter(Boolean)
     .slice(0, limit);
 }
-

@@ -3,6 +3,7 @@ import { ExternalLink } from "lucide-react";
 
 import { WatchlistButton } from "@/components/watchlist-button";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
+import { PriceBadge } from "@/components/price-badge";
 import type { Game, Rating } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { compactNumber, releaseDate, score, signedCompact, tagsFromGame } from "@/lib/format";
@@ -97,6 +98,7 @@ export function DashboardCard({ game }: { game: Game }) {
         {game.days_to_release != null && game.days_to_release > 0 && (
           <span className="shrink-0 text-[#7b8cde]">（{game.days_to_release}天）</span>
         )}
+        <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={isFree} />
         <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
       </div>
 
@@ -118,11 +120,8 @@ export function DashboardCard({ game }: { game: Game }) {
       </div>
 
       {/* ── Tags ── */}
-      {(tags.length > 0 || isFree) && (
+      {tags.length > 0 && (
         <div className="mt-1.5 flex flex-wrap gap-1">
-          {isFree && (
-            <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[11px] text-emerald-400">Free</span>
-          )}
           {tags.map((tag) => (
             <span key={tag} className="rounded bg-[#0b0e16] px-1.5 py-0.5 text-[11px] text-[#7a8099]">
               {tag}

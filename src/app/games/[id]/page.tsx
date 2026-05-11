@@ -4,10 +4,12 @@ import { ArrowLeft, ExternalLink, Globe, Users } from "lucide-react";
 
 import { AppShell, MobileNav } from "@/components/app-shell";
 import { FollowersTrend } from "@/components/charts/followers-trend";
+import { PriceTrend } from "@/components/charts/price-trend";
 import { ReviewTrend } from "@/components/charts/review-trend";
 import { ScoreRadar } from "@/components/charts/score-radar";
 import { RatingBadge } from "@/components/rating-badge";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
+import { PriceBadge } from "@/components/price-badge";
 import { ScoreInfo } from "@/components/score-info";
 import { SentimentRing } from "@/components/sentiment-ring";
 import { WatchlistButton } from "@/components/watchlist-button";
@@ -20,6 +22,7 @@ import {
   releaseStatus,
   score,
   signedCompact,
+  steamPriceLabel,
   tagsFromGame,
 } from "@/lib/format";
 
@@ -48,7 +51,17 @@ export default async function GameDetailPage({
   const gameId = Number(id);
   if (!Number.isFinite(gameId)) notFound();
 
-  const [game, snapshots, scores, reviewMonthly, reviewSummary, similar, releaseDateEvents] = await Promise.all([
+  const [
+    game,
+    snapshots,
+    scores,
+    reviewMonthly,
+    reviewSummary,
+    similar,
+    releaseDateEvents,
+    prices,
+    priceHistory,
+  ] = await Promise.all([
     gameApi.getGame(gameId),
     gameApi.getTrend(gameId, 45),
     gameApi.getScores(gameId),
@@ -56,6 +69,8 @@ export default async function GameDetailPage({
     gameApi.getReviewSummary(gameId),
     gameApi.getSimilar(gameId),
     gameApi.getReleaseDateEvents(gameId, 10),
+    gameApi.getPrices(gameId),
+    gameApi.getPriceHistory(gameId, "CN", 365),
   ]);
 
   if (!game) notFound();
@@ -107,6 +122,7 @@ export default async function GameDetailPage({
               <span className="rounded bg-[#0f1117] px-2 py-1 text-xs text-[#a0a8c0]">
                 {releaseDate(game.release_date, game.release_date_is_fuzzy)}
               </span>
+              <PriceBadge price={game.primary_price} isFreeFallback={Boolean(game.is_free)} />
               <ReleaseDateChangeBadge event={game.latest_release_date_event} />
             </div>
 
@@ -257,6 +273,16 @@ export default async function GameDetailPage({
             </div>
           </section>
 
+          {/* Price trend */}
+          {priceHistory.length > 0 && (
+            <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
+              <SectionHeader eyebrow="Steam Price" title="国区价格趋势" />
+              <div className="mt-4">
+                <PriceTrend snapshots={priceHistory} />
+              </div>
+            </section>
+          )}
+
           {/* Score radar */}
           <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-5">
             <div className="flex items-start justify-between gap-2">
@@ -341,6 +367,29 @@ export default async function GameDetailPage({
 
         {/* ── Right sidebar ── */}
         <aside className="space-y-5 xl:sticky xl:top-24 xl:self-start">
+
+          {/* Regional prices */}
+          {prices.length > 0 && (
+            <section className="rounded-xl border border-[#2a2d3e] bg-[#12152b] p-4">
+              <SectionHeader eyebrow="Steam Price" title="区域价格" compact />
+              <div className="mt-3 space-y-1.5">
+                {prices.slice(0, 8).map((price) => (
+                  <div key={price.region_code} className="flex items-center justify-between rounded-md bg-[#0f1220] px-2.5 py-2 text-xs">
+                    <span className="font-mono text-[#7a8099]">{price.region_code}</span>
+                    <span className={price.discount_percent ? "font-semibold text-amber-300" : "font-semibold text-[#c0c8e0]"}>
+                      {price.discount_percent ? `-${price.discount_percent}% ` : ""}
+                      {steamPriceLabel(price)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {game.primary_price?.fetched_at && (
+                <div className="mt-2 text-[11px] text-[#4a5070]">
+                  更新于 {game.primary_price.fetched_at.slice(0, 10)}
+                </div>
+              )}
+            </section>
+          )}
 
           {/* Steam review sentiment */}
           {reviewTotal ? (
