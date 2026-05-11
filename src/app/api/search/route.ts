@@ -4,6 +4,8 @@ const API_BASE =
   process.env.GAME_TRACKER_API_BASE?.replace(/\/$/, "") ??
   "http://localhost:8000/api";
 
+const MIN_FOLLOWERS_FOR_FUZZY_MATCH = 1000;
+
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q") ?? "";
   const limit = req.nextUrl.searchParams.get("limit") ?? "15";
@@ -20,7 +22,13 @@ export async function GET(req: NextRequest) {
         );
     if (!upstream.ok) return NextResponse.json([]);
     const data = await upstream.json();
-    if (!hot) return NextResponse.json(data);
+    if (!hot) {
+      return NextResponse.json(
+        Array.isArray(data)
+          ? data.filter((game) => passesPublicSearchQuality(game, q)).slice(0, Number(limit))
+          : [],
+      );
+    }
     return NextResponse.json(
       Array.isArray(data)
         ? data
@@ -32,4 +40,21 @@ export async function GET(req: NextRequest) {
   } catch {
     return NextResponse.json([]);
   }
+}
+
+function normalizeSearchText(value: string | null | undefined) {
+  return (value ?? "")
+    .normalize("NFKC")
+    .toLocaleLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
+function passesPublicSearchQuality(game: Record<string, unknown>, query: string) {
+  const q = normalizeSearchText(query);
+  const exactFields = [game.name, game.name_en].map((value) =>
+    normalizeSearchText(typeof value === "string" ? value : undefined),
+  );
+  if (exactFields.some((field) => field && field === q)) return true;
+  const followers = typeof game.followers === "number" ? game.followers : 0;
+  return followers >= MIN_FOLLOWERS_FOR_FUZZY_MATCH;
 }

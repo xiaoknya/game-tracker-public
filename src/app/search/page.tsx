@@ -2,6 +2,9 @@ import { AppShell, MobileNav } from "@/components/app-shell";
 import { SearchResultsView } from "@/components/search-results-view";
 import { gameApi, type Game } from "@/lib/api";
 
+const MIN_FOLLOWERS_FOR_FUZZY_MATCH = 1000;
+const MIN_REVIEWS_FOR_RELEASED_FUZZY_MATCH = 500;
+
 export const dynamic = "force-dynamic";
 
 export const metadata = {
@@ -81,12 +84,15 @@ function mergeSearchResults(backendResults: Game[], publicGames: Game[], query: 
   const byId = new Map<number, { game: Game; score: number; index: number }>();
 
   backendResults.forEach((game, index) => {
-    byId.set(game.id, { game, score: 70, index });
+    const score = Math.max(matchScore(game, query), 70);
+    if (!passesPublicSearchQuality(game, score)) return;
+    byId.set(game.id, { game, score, index });
   });
 
   publicGames.forEach((game, index) => {
     const score = matchScore(game, query);
     if (score < 0) return;
+    if (!passesPublicSearchQuality(game, score)) return;
     const existing = byId.get(game.id);
     if (!existing || score > existing.score) {
       byId.set(game.id, { game, score, index: existing?.index ?? backendResults.length + index });
@@ -99,4 +105,18 @@ function mergeSearchResults(backendResults: Game[], publicGames: Game[], query: 
       return (b.game.total_score ?? 0) - (a.game.total_score ?? 0) || a.index - b.index;
     })
     .map(({ game }) => game);
+}
+
+function passesPublicSearchQuality(game: Game, score: number) {
+  if (score >= 100) return true;
+  if ((game.followers ?? 0) >= MIN_FOLLOWERS_FOR_FUZZY_MATCH) return true;
+  if (getReviewTotal(game) >= MIN_REVIEWS_FOR_RELEASED_FUZZY_MATCH) return true;
+  return false;
+}
+
+function getReviewTotal(game: Game) {
+  if ("steam_review_total" in game && typeof game.steam_review_total === "number") {
+    return game.steam_review_total;
+  }
+  return 0;
 }
