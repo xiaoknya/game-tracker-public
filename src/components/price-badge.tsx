@@ -6,12 +6,14 @@ export function PriceBadge({
   price,
   compact = false,
   mutedWhenUnknown = false,
+  hideWhenUnknown = false,
   isFreeFallback = false,
   className,
 }: {
   price: GamePrice | null | undefined;
   compact?: boolean;
   mutedWhenUnknown?: boolean;
+  hideWhenUnknown?: boolean;
   isFreeFallback?: boolean;
   className?: string;
 }) {
@@ -19,6 +21,8 @@ export function PriceBadge({
   const discount = price?.discount_percent && price.discount_percent > 0 ? price.discount_percent : null;
   const isFree = Boolean(price?.is_free || (!price && isFreeFallback));
   const isKnown = Boolean(isFree || (price && price.is_available));
+
+  if (hideWhenUnknown && !isKnown) return null;
 
   return (
     <span
@@ -42,4 +46,8 @@ export function PriceBadge({
       <span>{label}</span>
     </span>
   );
+}
+
+export function hasDisplayablePrice(price: GamePrice | null | undefined, isFreeFallback = false) {
+  return Boolean(price?.is_free || (price && price.is_available) || (!price && isFreeFallback));
 }

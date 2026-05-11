@@ -3,7 +3,7 @@ import { ExternalLink } from "lucide-react";
 
 import { WatchlistButton } from "@/components/watchlist-button";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
-import { PriceBadge } from "@/components/price-badge";
+import { PriceBadge, hasDisplayablePrice } from "@/components/price-badge";
 import type { Game, Rating } from "@/lib/api";
 import { steamCover } from "@/lib/api";
 import { compactNumber, releaseDate, score, signedCompact, tagsFromGame } from "@/lib/format";
@@ -50,6 +50,7 @@ export function DashboardCard({ game }: { game: Game }) {
   const delta = game.followers_7d_delta ?? 0;
   const glowClass = ratingGlow[String(game.rating ?? "")] ?? "hover:border-[#4a527b]";
   const isFree = Boolean(game.is_free);
+  const hasPrice = hasDisplayablePrice(game.primary_price, isFree);
 
   return (
     <article
@@ -79,6 +80,15 @@ export function DashboardCard({ game }: { game: Game }) {
           compact
           className="absolute right-2 top-2 z-20 bg-[#0b0e16]/75 backdrop-blur"
         />
+        {hasPrice && (
+          <PriceBadge
+            price={game.primary_price}
+            compact
+            hideWhenUnknown
+            isFreeFallback={isFree}
+            className="pointer-events-none absolute bottom-2 right-2 z-20 border-white/15 bg-[#05070d]/78 px-2 py-1 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur"
+          />
+        )}
         {/* Bottom fade */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#1a1d2e] to-transparent" />
       </div>
@@ -98,7 +108,6 @@ export function DashboardCard({ game }: { game: Game }) {
         {game.days_to_release != null && game.days_to_release > 0 && (
           <span className="shrink-0 text-[#7b8cde]">（{game.days_to_release}天）</span>
         )}
-        <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={isFree} />
         <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
       </div>
 

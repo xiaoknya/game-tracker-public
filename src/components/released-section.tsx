@@ -196,7 +196,7 @@ export function ReleasedSection({
       <div className="rounded-b-lg border-x border-b border-[#2a2d3e] bg-[#11141f] p-4">
         {visible.length ? (
           <>
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
               {visible.map((game) => (
                 <ReleasedCard key={game.id} game={game} />
               ))}

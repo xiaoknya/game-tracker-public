@@ -7,7 +7,7 @@ import { type Game, steamCover } from '@/lib/api'
 import { compactNumber, signedCompact, score, releaseDate } from '@/lib/format'
 import { RatingBadge } from '@/components/rating-badge'
 import { ReleaseDateChangeBadge } from '@/components/release-date-change-badge'
-import { PriceBadge } from '@/components/price-badge'
+import { PriceBadge, hasDisplayablePrice } from '@/components/price-badge'
 import { useWatchlistIds } from '@/lib/watchlist'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -146,6 +146,8 @@ function DayCell({ cell, onClick }: { cell: CalendarCell; onClick: () => void })
 function GameCard({ game, saved }: { game: Game; saved?: boolean }) {
   const tags = (game.tags || game.genre || '').split(',').map(t => t.trim()).filter(Boolean).slice(0, 3)
   const cover = game.cover_image || steamCover(game.steam_appid)
+  const hasPrice = hasDisplayablePrice(game.primary_price, Boolean(game.is_free))
+  const hasReleaseDateChange = Boolean(game.latest_release_date_event)
 
   return (
     <Link
@@ -184,10 +186,12 @@ function GameCard({ game, saved }: { game: Game; saved?: boolean }) {
             <span className="text-[#7b8cde]">评分 {score(game.total_score)}</span>
           )}
         </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={Boolean(game.is_free)} />
-          <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
-        </div>
+        {(hasPrice || hasReleaseDateChange) && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <PriceBadge price={game.primary_price} compact hideWhenUnknown isFreeFallback={Boolean(game.is_free)} />
+            <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
+          </div>
+        )}
       </div>
     </Link>
   )
@@ -196,6 +200,8 @@ function GameCard({ game, saved }: { game: Game; saved?: boolean }) {
 function FeaturedCard({ game, saved }: { game: Game; saved?: boolean }) {
   const cover = game.cover_image || steamCover(game.steam_appid)
   const daysLeft = game.days_to_release
+  const hasPrice = hasDisplayablePrice(game.primary_price, Boolean(game.is_free))
+  const hasReleaseDateChange = Boolean(game.latest_release_date_event)
 
   return (
     <Link
@@ -208,6 +214,15 @@ function FeaturedCard({ game, saved }: { game: Game; saved?: boolean }) {
         ) : (
           <div className="h-full w-full bg-[#1a1d2e]" />
         )}
+        {hasPrice && (
+          <PriceBadge
+            price={game.primary_price}
+            compact
+            hideWhenUnknown
+            isFreeFallback={Boolean(game.is_free)}
+            className="pointer-events-none absolute bottom-2 right-2 border-white/15 bg-[#05070d]/78 px-2 py-1 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur"
+          />
+        )}
       </div>
       <div className="p-2.5">
         <div className="flex items-start gap-2">
@@ -219,10 +234,11 @@ function FeaturedCard({ game, saved }: { game: Game; saved?: boolean }) {
           <span>{releaseDate(game.release_date, game.release_date_is_fuzzy)}</span>
           <span>{compactNumber(game.followers)} 关注</span>
         </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={Boolean(game.is_free)} />
-          <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
-        </div>
+        {hasReleaseDateChange && (
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
+          </div>
+        )}
         {daysLeft !== null && daysLeft !== undefined && daysLeft >= 0 && (
           <div className="mt-1 text-[10px] text-[#7b8cde]">
             {daysLeft === 0 ? '今日发售' : `${daysLeft} 天后发售`}
@@ -244,7 +260,7 @@ function FuzzyItem({ game }: { game: Game }) {
         <div className="mt-0.5 text-xs text-[#5a6080]">{releaseDate(game.release_date, true)}</div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={Boolean(game.is_free)} />
+        <PriceBadge price={game.primary_price} compact hideWhenUnknown isFreeFallback={Boolean(game.is_free)} />
         <span className="text-xs text-[#7a8099]">{compactNumber(game.followers)}</span>
         <RatingBadge rating={game.rating} className="h-5 min-w-7 text-xs" />
       </div>

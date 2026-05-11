@@ -4,7 +4,7 @@ import type { ReleasedGame, Rating, ReviewSentiment, ReviewTopic } from "@/lib/a
 import { steamCover } from "@/lib/api";
 import { tagsFromGame } from "@/lib/format";
 import { ReleaseDateChangeBadge } from "@/components/release-date-change-badge";
-import { PriceBadge } from "@/components/price-badge";
+import { PriceBadge, hasDisplayablePrice } from "@/components/price-badge";
 
 const CORNER_GRADIENT: Record<string, [string, string]> = {
   S: ['rgba(225,29,72,0.92)', 'rgba(225,29,72,0)'],
@@ -82,6 +82,8 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
   const image = game.cover_image || steamCover(game.steam_appid);
   const tags = tagsFromGame(game, 3);
   const glowClass = ratingGlow[String(game.rating ?? "")] ?? "hover:border-[#4a527b]";
+  const isFree = Boolean(game.is_free);
+  const hasPrice = hasDisplayablePrice(game.primary_price, isFree);
 
   // Review stats
   const positiveRate =
@@ -145,16 +147,26 @@ export function ReleasedCard({ game }: { game: ReleasedGame }) {
             {playtimeLabel}
           </div>
         )}
+        {hasPrice && (
+          <PriceBadge
+            price={game.primary_price}
+            compact
+            hideWhenUnknown
+            isFreeFallback={isFree}
+            className="pointer-events-none absolute bottom-2 right-2 border-white/15 bg-[#05070d]/78 px-2 py-1 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.35)] backdrop-blur"
+          />
+        )}
       </div>
 
       {/* ── Body ── */}
       <div>
         {/* Game name */}
         <h3 className="line-clamp-1 text-[14px] font-bold text-[#e0e4f0]">{game.name}</h3>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          <PriceBadge price={game.primary_price} compact mutedWhenUnknown isFreeFallback={Boolean(game.is_free)} />
-          <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
-        </div>
+        {game.latest_release_date_event && (
+          <div className="mt-1.5 flex">
+            <ReleaseDateChangeBadge event={game.latest_release_date_event} compact />
+          </div>
+        )}
 
         {/* ── Good-rate bar ── */}
         {positiveRate != null && (
