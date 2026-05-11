@@ -80,16 +80,16 @@ function compareFeatured(a: Game, b: Game): number {
 
 function StatCard({ label, value, sub }: { label: string; value: number | string; sub?: string }) {
   return (
-    <div className="rounded-lg border border-[#2a2d3e] bg-white/[0.04] px-3 py-2 min-w-[90px]">
-      <div className="text-[10px] uppercase tracking-widest text-[#5a70c0]">{label}</div>
-      <div className="mt-0.5 text-xl font-bold text-[#e0e4f0]">{value}</div>
-      {sub && <div className="mt-0.5 truncate text-[11px] text-[#5a6080]">{sub}</div>}
+    <div className="min-w-[112px] rounded-lg border border-[#2a2d3e] bg-white/[0.04] px-3 py-2.5">
+      <div className="text-[11px] uppercase tracking-widest text-[#5a70c0]">{label}</div>
+      <div className="mt-0.5 text-2xl font-bold leading-tight text-[#e0e4f0]">{value}</div>
+      {sub && <div className="mt-0.5 truncate text-xs text-[#5a6080]">{sub}</div>}
     </div>
   )
 }
 
 function DayCell({ cell, onClick }: { cell: CalendarCell; onClick: () => void }) {
-  const base = 'relative flex min-h-[52px] cursor-pointer flex-col rounded-md border p-1 text-left transition-all'
+  const base = 'relative flex min-h-[64px] cursor-pointer flex-col rounded-lg border p-1.5 text-left transition-all sm:min-h-[72px] sm:p-2 xl:min-h-[68px]'
 
   let colorCls = 'border-transparent bg-transparent hover:bg-white/[0.04]'
   if (cell.isSelected) {
@@ -107,20 +107,20 @@ function DayCell({ cell, onClick }: { cell: CalendarCell; onClick: () => void })
 
   return (
     <button className={`${base} ${colorCls} ${mutedCls}`} onClick={onClick}>
-      <div className="flex items-start justify-between gap-0.5">
-        <span className={`text-[11px] font-medium leading-none ${cell.isToday ? 'text-teal-300' : 'text-[#a0b0d0]'}`}>
+      <div className="flex items-start justify-between gap-1">
+        <span className={`text-[15px] font-semibold leading-none sm:text-base ${cell.isToday ? 'text-teal-300' : 'text-[#a0b0d0]'}`}>
           {cell.day}
         </span>
         {cell.isToday && (
-          <span className="rounded-full bg-teal-400/25 px-1 py-0.5 text-[8px] font-bold leading-none text-teal-300">今</span>
+          <span className="rounded-full bg-teal-400/25 px-1.5 py-0.5 text-[10px] font-bold leading-none text-teal-300">今</span>
         )}
       </div>
       {cell.count > 0 && (
-        <div className="mt-auto flex flex-col gap-0.5">
+        <div className="mt-auto flex flex-col gap-1">
           {cell.signals.slice(0, 2).map((s, i) => (
             <span
               key={i}
-              className={`inline-block w-fit rounded-sm px-1 text-[8px] font-bold leading-tight ${
+              className={`inline-block w-fit rounded-sm px-1.5 py-0.5 text-[10px] font-bold leading-none ${
                 s === 'S' ? 'bg-rose-400/20 text-rose-300' :
                 s === 'A' ? 'bg-amber-400/20 text-amber-300' :
                 'bg-sky-400/20 text-sky-300'
@@ -130,10 +130,10 @@ function DayCell({ cell, onClick }: { cell: CalendarCell; onClick: () => void })
             </span>
           ))}
           {cell.count > 0 && (
-            <span className="text-[9px] text-[#5a6080]">{cell.count}款</span>
+            <span className="text-[10px] leading-none text-[#5a6080] sm:text-[11px]">{cell.count}款</span>
           )}
           {cell.savedCount > 0 && (
-            <span className="text-[9px] text-[#9aa8ff]">已藏 {cell.savedCount}</span>
+            <span className="text-[10px] leading-none text-[#9aa8ff] sm:text-[11px]">已藏 {cell.savedCount}</span>
           )}
         </div>
       )}
@@ -478,7 +478,7 @@ export function CalendarView({
     : ''
 
   const navBtnCls = (disabled: boolean) =>
-    `grid size-8 place-items-center rounded-md border text-lg transition ${
+    `grid size-9 place-items-center rounded-md border text-xl transition sm:size-10 ${
       disabled
         ? 'cursor-not-allowed border-[#1e2133] text-[#3a3f5c]'
         : 'border-[#2a2d3e] text-[#a0b0d0] hover:border-[#7b8cde] hover:text-[#e0e4f0]'
@@ -496,7 +496,7 @@ export function CalendarView({
               覆盖 {availableMonthKeys.length} 个自然月 · 展示 S/A/B 级游戏
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:flex sm:flex-wrap sm:gap-3">
             <StatCard label="本月发售" value={selectedMonthGames.length} sub={`${releaseDaysCount} 个发售日`} />
             <StatCard label="A级以上" value={highRatedCount} sub={topGameName} />
             <StatCard label="当天上新" value={selectedDayGames.length} sub={selectedDateLabel} />
@@ -506,19 +506,19 @@ export function CalendarView({
       </div>
 
       {/* Main grid */}
-      <div className="grid gap-4 xl:grid-cols-[340px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[420px_1fr] 2xl:grid-cols-[480px_1fr]">
         {/* Calendar panel */}
-        <div className="xl:sticky xl:top-[76px] xl:self-start rounded-xl border border-[#2a2d3e] bg-gradient-to-b from-[#1c2240] to-[#141828] p-4 space-y-3">
+        <div className="space-y-4 rounded-xl border border-[#2a2d3e] bg-gradient-to-b from-[#1c2240] to-[#141828] p-4 sm:p-5 xl:sticky xl:top-[76px] xl:self-start">
           {/* Month nav header */}
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="text-[10px] uppercase tracking-widest text-[#5a70c0]">月历导航</div>
-              <div className="mt-1 text-2xl font-bold text-[#e0e4f0]">{selectedMonthLabel}</div>
-              <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
-                <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[#a0b0e0]">
+              <div className="text-[11px] uppercase tracking-widest text-[#5a70c0]">月历导航</div>
+              <div className="mt-1 text-3xl font-bold leading-tight text-[#e0e4f0] sm:text-[34px]">{selectedMonthLabel}</div>
+              <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[#a0b0e0]">
                   {highRatedCount} 款 A+ 以上
                 </span>
-                <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[#a0b0e0]">
+                <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[#a0b0e0]">
                   {selectedMonthGames.length} 款精确发售
                 </span>
               </div>
@@ -544,23 +544,23 @@ export function CalendarView({
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-1.5 text-[11px]">
-            <span className="rounded-full border border-rose-400/30 bg-rose-400/10 px-2 py-0.5 text-rose-300">S 级</span>
-            <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-amber-300">A 级</span>
-            <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-2 py-0.5 text-sky-300">B 级</span>
-                <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2 py-0.5 text-teal-300">今日</span>
-            <span className="rounded-full border border-[#7b8cde]/30 bg-[#7b8cde]/10 px-2 py-0.5 text-[#b7c2ff]">已收藏</span>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            <span className="rounded-full border border-rose-400/30 bg-rose-400/10 px-2.5 py-1 text-rose-300">S 级</span>
+            <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-amber-300">A 级</span>
+            <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-sky-300">B 级</span>
+            <span className="rounded-full border border-teal-400/30 bg-teal-400/10 px-2.5 py-1 text-teal-300">今日</span>
+            <span className="rounded-full border border-[#7b8cde]/30 bg-[#7b8cde]/10 px-2.5 py-1 text-[#b7c2ff]">已收藏</span>
           </div>
 
           {/* Weekday header */}
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-[#5a6080]">
+          <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-semibold text-[#5a6080] sm:text-sm">
             {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => (
               <span key={d}>{d}</span>
             ))}
           </div>
 
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1.5">
             {calendarCells.map(cell => (
               <DayCell key={cell.key} cell={cell} onClick={() => selectCell(cell)} />
             ))}
