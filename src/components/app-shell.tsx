@@ -60,7 +60,7 @@ export function AppShell({
         </nav>
       </aside>
 
-      <div className="min-w-0 flex-1 flex flex-col overflow-y-auto">
+      <div className="min-w-0 flex-1 flex flex-col overflow-y-auto [scrollbar-gutter:stable]">
         <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-[#2a2d3e] bg-[#141623]/95 px-4 backdrop-blur lg:px-6">
           <div className="flex min-w-0 items-center gap-3">
             <span className="hidden size-8 shrink-0 items-center justify-center rounded-md bg-[#252a42] text-[#9aa8ff] sm:flex">
