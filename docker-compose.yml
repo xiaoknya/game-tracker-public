@@ -4,6 +4,7 @@ services:
     restart: unless-stopped
     environment:
       GAME_TRACKER_API_BASE: http://backend:8000/api
+      PUBLIC_SITE_URL: https://game.xiaoknya.cn
       TZ: Asia/Shanghai
     ports:
       - "127.0.0.1:3000:3000"

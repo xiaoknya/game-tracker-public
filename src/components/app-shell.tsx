@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bookmark, Calendar, CheckCircle2, Gamepad2, LineChart, Search, Swords } from "lucide-react";
+import { Bookmark, Calendar, CheckCircle2, Gamepad2, LineChart, Search, Sparkles, Swords } from "lucide-react";
 
 import { navItems } from "@/components/app-nav";
 import { MobileSidebar } from "@/components/mobile-sidebar";
@@ -9,6 +9,7 @@ const pageMeta: Record<string, { title: string; sub: string; icon: React.Element
   "/":         { title: "主看板",     sub: "即将发售游戏评级",  icon: LineChart    },
   "/released": { title: "已发售游戏", sub: "近期上线游戏汇总",  icon: CheckCircle2 },
   "/calendar": { title: "发售日历",   sub: "按日期浏览发售计划", icon: Calendar     },
+  "/recommendations": { title: "为我推荐", sub: "连接 Steam 后个性化推荐", icon: Sparkles },
   "/watchlist": { title: "我的收藏", sub: "本地保存的关注列表", icon: Bookmark },
   "/search": { title: "搜索结果", sub: "按关键词查找游戏", icon: Search },
 };
