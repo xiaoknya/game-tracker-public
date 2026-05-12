@@ -13,6 +13,7 @@ const DAY_OPTIONS = [30, 60, 90, 180]
 const INITIAL = 12
 const STEP = 12
 const SORT_OPTIONS = [
+  { key: 'combined', label: '综合排序' },
   { key: 'positive', label: '好评率' },
   { key: 'date', label: '发售时间' },
   { key: 'reviews', label: '评测数' },
@@ -30,6 +31,25 @@ const RATING_ACTIVE: Record<Rating, string> = {
 const CHIP_INACTIVE = 'border-[#2a2d3e] bg-transparent text-[#a0a8c0] hover:bg-[#202437]'
 const CHIP_DAYS_ACTIVE = 'border-[#7b8cde] bg-[#7b8cde] text-white'
 
+function positiveRate(game: ReleasedGame) {
+  if (!game.steam_review_total || !game.steam_review_positive) return -1
+  return game.steam_review_positive / game.steam_review_total
+}
+
+function reviewConfidenceScore(game: ReleasedGame) {
+  const total = game.steam_review_total ?? 0
+  const positive = game.steam_review_positive ?? 0
+  if (total <= 0 || positive <= 0) return -1
+
+  const z = 1.96
+  const phat = positive / total
+  const z2 = z * z
+  return (
+    (phat + z2 / (2 * total) - z * Math.sqrt((phat * (1 - phat) + z2 / (4 * total)) / total)) /
+    (1 + z2 / total)
+  )
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 export function ReleasedSection({
   allGames,
@@ -39,7 +59,7 @@ export function ReleasedSection({
   selectedDays: number
 }) {
   const [selected, setSelected] = useState<Set<Rating>>(new Set())
-  const [sortBy, setSortBy] = useState<SortKey>('positive')
+  const [sortBy, setSortBy] = useState<SortKey>('combined')
   const [opinion, setOpinion] = useState<OpinionFilter>('all')
   const [visibleCount, setVisibleCount] = useState(INITIAL)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
@@ -74,9 +94,14 @@ export function ReleasedSection({
     })
 
     return games.sort((a, b) => {
+      if (sortBy === 'combined') {
+        const scoreDiff = reviewConfidenceScore(b) - reviewConfidenceScore(a)
+        if (scoreDiff !== 0) return scoreDiff
+        return (b.steam_review_total ?? -1) - (a.steam_review_total ?? -1)
+      }
       if (sortBy === 'positive') {
-        const aRate = a.steam_review_total && a.steam_review_positive ? a.steam_review_positive / a.steam_review_total : -1
-        const bRate = b.steam_review_total && b.steam_review_positive ? b.steam_review_positive / b.steam_review_total : -1
+        const aRate = positiveRate(a)
+        const bRate = positiveRate(b)
         return bRate - aRate
       }
       if (sortBy === 'reviews') return (b.steam_review_total ?? -1) - (a.steam_review_total ?? -1)
