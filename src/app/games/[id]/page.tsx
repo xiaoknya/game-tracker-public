@@ -332,14 +332,11 @@ export default async function GameDetailPage({
                   在 SteamDB 查看 <ExternalLink className="size-3.5" />
                 </a>
               </div>
-              <div className="mt-4 overflow-hidden rounded-lg border border-[#1e2235] bg-[#0b0e16]">
+              <div className="mt-4 overflow-hidden rounded-lg border border-[#2a2d3e] bg-[#f2f3f5] shadow-[0_12px_36px_rgba(0,0,0,0.28)]">
                 <iframe
                   title={`${game.name} SteamDB 在线人数趋势`}
                   src={`https://steamdb.info/embed/?appid=${game.steam_appid}`}
                   className="block h-[360px] w-full border-0 sm:h-[389px]"
-                  style={{
-                    filter: "invert(0.92) hue-rotate(180deg) saturate(0.85) contrast(0.95) brightness(0.82)",
-                  }}
                   loading="lazy"
                 />
               </div>
