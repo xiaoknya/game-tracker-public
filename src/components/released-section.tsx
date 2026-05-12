@@ -30,10 +30,19 @@ const RATING_ACTIVE: Record<Rating, string> = {
 }
 const CHIP_INACTIVE = 'border-[#2a2d3e] bg-transparent text-[#a0a8c0] hover:bg-[#202437]'
 const CHIP_DAYS_ACTIVE = 'border-[#7b8cde] bg-[#7b8cde] text-white'
+const REVIEW_VOLUME_CAP = 30000
+const FOLLOWER_HEAT_CAP = 100000
+const FOLLOWER_GROWTH_CAP = 5000
 
 function positiveRate(game: ReleasedGame) {
   if (!game.steam_review_total || !game.steam_review_positive) return -1
   return game.steam_review_positive / game.steam_review_total
+}
+
+function logSignal(value: number | null | undefined, cap: number) {
+  const safeValue = Math.max(0, value ?? 0)
+  if (safeValue <= 0) return 0
+  return Math.min(1, Math.log1p(safeValue) / Math.log1p(cap))
 }
 
 function reviewConfidenceScore(game: ReleasedGame) {
@@ -48,6 +57,17 @@ function reviewConfidenceScore(game: ReleasedGame) {
     (phat + z2 / (2 * total) - z * Math.sqrt((phat * (1 - phat) + z2 / (4 * total)) / total)) /
     (1 + z2 / total)
   )
+}
+
+function releasedCompositeScore(game: ReleasedGame) {
+  const confidence = reviewConfidenceScore(game)
+  if (confidence < 0) return -1
+
+  const reviewVolume = logSignal(game.steam_review_total, REVIEW_VOLUME_CAP)
+  const followerHeat = logSignal(game.followers, FOLLOWER_HEAT_CAP)
+  const followerGrowth = logSignal(game.followers_7d_delta, FOLLOWER_GROWTH_CAP)
+
+  return confidence * 0.72 + reviewVolume * 0.2 + followerHeat * 0.06 + followerGrowth * 0.02
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -95,8 +115,10 @@ export function ReleasedSection({
 
     return games.sort((a, b) => {
       if (sortBy === 'combined') {
-        const scoreDiff = reviewConfidenceScore(b) - reviewConfidenceScore(a)
+        const scoreDiff = releasedCompositeScore(b) - releasedCompositeScore(a)
         if (scoreDiff !== 0) return scoreDiff
+        const confidenceDiff = reviewConfidenceScore(b) - reviewConfidenceScore(a)
+        if (confidenceDiff !== 0) return confidenceDiff
         return (b.steam_review_total ?? -1) - (a.steam_review_total ?? -1)
       }
       if (sortBy === 'positive') {
